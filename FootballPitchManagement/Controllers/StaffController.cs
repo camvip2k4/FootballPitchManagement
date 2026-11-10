@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FootballPitchManagement.Controllers
 {
-    [Authorize(Roles = "Staff,Manager,Admin")]
+    [Authorize(Roles = "STAFF,Staff,MANAGER,Manager,ADMIN,Admin")]
     public class StaffController : Controller
     {
         private readonly ApplicationDbContext _context;

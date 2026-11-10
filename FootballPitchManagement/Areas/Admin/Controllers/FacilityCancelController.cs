@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Manager,Admin")]
+    [Authorize(Roles = "MANAGER,Manager,ADMIN,Admin")]
     public class FacilityCancelController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,7 +21,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             _bookingService = bookingService;
         }
 
-        // GET: /Admin/FacilityCancel (UC39)
+        // GET: /Admin/FacilityCancel
         public async Task<IActionResult> Index()
         {
             var activeBookings = await _context.Bookings
@@ -35,14 +35,14 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             return View(activeBookings);
         }
 
-        // POST: /Admin/FacilityCancel/Cancel (UC39)
+        // POST: /Admin/FacilityCancel/Cancel
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int bookingId, string reason)
         {
             if (string.IsNullOrWhiteSpace(reason))
             {
-                TempData["ErrorMessage"] = "Mandatory cancellation reason must be provided (UC39).";
+                TempData["ErrorMessage"] = "Vui lòng nhập lý do hủy đặt sân do sự cố cơ sở vật chất / thời tiết.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -68,4 +68,3 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
         }
     }
 }
-

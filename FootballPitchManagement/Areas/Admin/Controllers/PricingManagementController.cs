@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Manager,Admin")]
+    [Authorize(Roles = "MANAGER,Manager,ADMIN,Admin")]
     public class PricingManagementController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +19,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: /Admin/PricingManagement (UC26)
+        // GET: /Admin/PricingManagement
         public async Task<IActionResult> Index(int? fieldId)
         {
             var query = _context.PricingRules
@@ -66,7 +66,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             {
                 _context.PricingRules.Add(rule);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Pricing rule added successfully.";
+                TempData["SuccessMessage"] = "Đã thêm quy tắc bảng giá mới thành công.";
                 return RedirectToAction(nameof(Index), new { fieldId = rule.FieldId });
             }
 
@@ -85,11 +85,10 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
                 var fieldId = rule.FieldId;
                 _context.PricingRules.Remove(rule);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Pricing rule deleted.";
+                TempData["SuccessMessage"] = "Đã xóa quy tắc bảng giá.";
                 return RedirectToAction(nameof(Index), new { fieldId });
             }
             return RedirectToAction(nameof(Index));
         }
     }
 }
-

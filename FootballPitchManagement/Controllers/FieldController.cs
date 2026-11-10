@@ -77,12 +77,12 @@ namespace FootballPitchManagement.Controllers
                          b.Status == BookingStatus.CHECKED_IN ||
                          (b.Status == BookingStatus.PENDING_PAYMENT && b.HoldExpiresAt > now)));
 
-                    string statusDisplay = "Available";
+                    string statusDisplay = "Còn trống";
                     string badgeClass = "bg-success";
 
                     if (f.Status == FieldStatus.MAINTENANCE)
                     {
-                        statusDisplay = "Maintenance";
+                        statusDisplay = "Bảo trì";
                         badgeClass = "bg-danger";
                         isAvailable = false;
                     }
@@ -90,17 +90,17 @@ namespace FootballPitchManagement.Controllers
                     {
                         if (booking.Status == BookingStatus.PENDING_PAYMENT)
                         {
-                            statusDisplay = "Hold (15m)";
+                            statusDisplay = "Đang giữ chỗ (15p)";
                             badgeClass = "bg-warning text-dark";
                         }
                         else if (booking.Status == BookingStatus.CHECKED_IN)
                         {
-                            statusDisplay = "In Use";
+                            statusDisplay = "Đang thi đấu";
                             badgeClass = "bg-info text-dark";
                         }
                         else
                         {
-                            statusDisplay = "Booked";
+                            statusDisplay = "Đã có người đặt";
                             badgeClass = "bg-secondary";
                         }
                     }
@@ -174,12 +174,12 @@ namespace FootballPitchManagement.Controllers
                      b.Status == BookingStatus.CHECKED_IN ||
                      (b.Status == BookingStatus.PENDING_PAYMENT && b.HoldExpiresAt > now)));
 
-                string statusDisplay = "Available";
+                string statusDisplay = "Còn trống";
                 string badgeClass = "bg-success";
 
                 if (field.Status == FieldStatus.MAINTENANCE)
                 {
-                    statusDisplay = "Maintenance";
+                    statusDisplay = "Bảo trì";
                     badgeClass = "bg-danger";
                     isAvailable = false;
                 }
@@ -187,17 +187,17 @@ namespace FootballPitchManagement.Controllers
                 {
                     if (booking.Status == BookingStatus.PENDING_PAYMENT)
                     {
-                        statusDisplay = "Hold (15m)";
+                        statusDisplay = "Đang giữ chỗ (15p)";
                         badgeClass = "bg-warning text-dark";
                     }
                     else if (booking.Status == BookingStatus.CHECKED_IN)
                     {
-                        statusDisplay = "In Use";
+                        statusDisplay = "Đang thi đấu";
                         badgeClass = "bg-info text-dark";
                     }
                     else
                     {
-                        statusDisplay = "Booked";
+                        statusDisplay = "Đã có người đặt";
                         badgeClass = "bg-secondary";
                     }
                 }

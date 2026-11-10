@@ -50,6 +50,7 @@ namespace FootballPitchManagement.Controllers
             }
 
             await SignInUserAsync(account);
+            TempData["SuccessMessage"] = $"Đăng nhập thành công! Xin chào {account.FullName}.";
 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {
@@ -85,7 +86,14 @@ namespace FootballPitchManagement.Controllers
             if (account != null)
             {
                 await SignInUserAsync(account);
-                TempData["SuccessMessage"] = $"Đăng nhập thành công với vai trò: {account.FullName} ({account.Role})";
+                string roleName = targetRole switch
+                {
+                    RoleType.ADMIN => "Quản Trị Viên (Admin)",
+                    RoleType.MANAGER => "Quản Lý Cơ Sở (Manager)",
+                    RoleType.STAFF => "Nhân Viên Lễ Tân (Staff)",
+                    _ => "Khách Hàng (Customer)"
+                };
+                TempData["SuccessMessage"] = $"Đã đăng nhập với vai trò: {account.FullName} [{roleName}]";
 
                 if (account.Role == RoleType.STAFF)
                 {
@@ -144,7 +152,7 @@ namespace FootballPitchManagement.Controllers
             await _context.SaveChangesAsync();
 
             await SignInUserAsync(account);
-            TempData["SuccessMessage"] = "Đăng ký tài khoản thành công! Chào mừng bạn đến với Sport Arena.";
+            TempData["SuccessMessage"] = "Đăng ký tài khoản thành công! Chào mừng bạn đến với SPORT ARENA.";
 
             return RedirectToAction("Index", "Home");
         }
@@ -161,12 +169,32 @@ namespace FootballPitchManagement.Controllers
 
         private async Task SignInUserAsync(Account account)
         {
+            var roleUpper = account.Role.ToString(); // "ADMIN", "MANAGER", "STAFF", "CUSTOMER"
+            var rolePascal = account.Role switch
+            {
+                RoleType.ADMIN => "Admin",
+                RoleType.MANAGER => "Manager",
+                RoleType.STAFF => "Staff",
+                _ => "Customer"
+            };
+
+            var roleTitle = account.Role switch
+            {
+                RoleType.ADMIN => "Quản Trị Viên (Admin)",
+                RoleType.MANAGER => "Quản Lý Cơ Sở (Manager)",
+                RoleType.STAFF => "Nhân Viên Lễ Tân (Staff)",
+                _ => "Khách Hàng"
+            };
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
                 new Claim(ClaimTypes.Name, account.Username),
                 new Claim(ClaimTypes.GivenName, account.FullName),
-                new Claim(ClaimTypes.Role, account.Role.ToString())
+                new Claim(ClaimTypes.Role, roleUpper),
+                new Claim(ClaimTypes.Role, rolePascal),
+                new Claim("UserRole", roleUpper),
+                new Claim("RoleTitle", roleTitle)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

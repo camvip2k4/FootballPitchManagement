@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Manager,Admin")]
+    [Authorize(Roles = "MANAGER,Manager,ADMIN,Admin")]
     public class FieldManagementController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +18,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: /Admin/FieldManagement (UC24)
+        // GET: /Admin/FieldManagement
         public async Task<IActionResult> Index()
         {
             var fields = await _context.FootballFields
@@ -45,15 +45,16 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
                 _context.FootballFields.Add(field);
                 await _context.SaveChangesAsync();
 
-                // Generate default slots for this field
+                // Tạo các ca đá tiêu chuẩn cho sân mới
                 var defaultSlots = new (string name, TimeSpan start, TimeSpan end)[]
                 {
-                    ("Slot 1 (06:00 - 07:30)", new TimeSpan(6, 0, 0), new TimeSpan(7, 30, 0)),
-                    ("Slot 2 (07:30 - 09:00)", new TimeSpan(7, 30, 0), new TimeSpan(9, 0, 0)),
-                    ("Slot 3 (15:30 - 17:00)", new TimeSpan(15, 30, 0), new TimeSpan(17, 0, 0)),
-                    ("Slot 4 (17:00 - 18:30)", new TimeSpan(17, 0, 0), new TimeSpan(18, 30, 0)),
-                    ("Slot 5 (18:30 - 20:00)", new TimeSpan(18, 30, 0), new TimeSpan(20, 0, 0)),
-                    ("Slot 6 (20:00 - 21:30)", new TimeSpan(20, 0, 0), new TimeSpan(21, 30, 0))
+                    ("Ca 1 (06:00 - 07:30)", new TimeSpan(6, 0, 0), new TimeSpan(7, 30, 0)),
+                    ("Ca 2 (07:30 - 09:00)", new TimeSpan(7, 30, 0), new TimeSpan(9, 0, 0)),
+                    ("Ca 3 (15:30 - 17:00)", new TimeSpan(15, 30, 0), new TimeSpan(17, 0, 0)),
+                    ("Ca 4 (17:00 - 18:30) [Giờ vàng]", new TimeSpan(17, 0, 0), new TimeSpan(18, 30, 0)),
+                    ("Ca 5 (18:30 - 20:00) [Giờ vàng]", new TimeSpan(18, 30, 0), new TimeSpan(20, 0, 0)),
+                    ("Ca 6 (20:00 - 21:30) [Giờ vàng]", new TimeSpan(20, 0, 0), new TimeSpan(21, 30, 0)),
+                    ("Ca 7 (21:30 - 23:00)", new TimeSpan(21, 30, 0), new TimeSpan(23, 0, 0))
                 };
 
                 foreach (var s in defaultSlots)
@@ -69,7 +70,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Field '{field.Name}' created with default time slots.";
+                TempData["SuccessMessage"] = $"Đã thêm mới sân bóng '{field.Name}' thành công kèm các ca thi đấu mặc định.";
                 return RedirectToAction(nameof(Index));
             }
             return View(field);
@@ -114,7 +115,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
                 field.IsActive = model.IsActive;
 
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Field '{field.Name}' updated successfully.";
+                TempData["SuccessMessage"] = $"Đã cập nhật thông tin sân '{field.Name}' thành công.";
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -130,7 +131,8 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             {
                 field.IsActive = !field.IsActive;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Field '{field.Name}' activation set to: {field.IsActive}.";
+                string statusText = field.IsActive ? "Đang mở nhận khách" : "Tạm đóng nhận khách";
+                TempData["SuccessMessage"] = $"Trạng thái mở đặt của sân '{field.Name}' đã chuyển sang: {statusText}.";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -145,10 +147,15 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             {
                 field.Status = status;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Field '{field.Name}' operational status set to: {field.Status}.";
+                string opText = status switch
+                {
+                    FieldStatus.AVAILABLE => "Sẵn sàng hoạt động",
+                    FieldStatus.MAINTENANCE => "Đang bảo trì cỏ/đèn",
+                    _ => "Đang có trận đấu"
+                };
+                TempData["SuccessMessage"] = $"Trạng thái vận hành thực tế của sân '{field.Name}' đã cập nhật thành: {opText}.";
             }
             return RedirectToAction(nameof(Index));
         }
     }
 }
-

@@ -18,40 +18,48 @@ namespace FootballPitchManagement.Models.ViewModels
         public DateTime HoldExpiresAt { get; set; }
         public BookingStatus BookingStatus { get; set; }
 
+        [Display(Name = "Số tiền thanh toán (VNĐ)")]
         public decimal PaymentAmount { get; set; }
+
+        [Display(Name = "Phương thức thanh toán")]
         public PaymentMethod Method { get; set; } = PaymentMethod.ONLINE_GATEWAY;
 
-        // Simulation switches for testing UC14
+        // Công tắc giả lập kiểm thử giao dịch
         public PaymentStatus SimulatedResult { get; set; } = PaymentStatus.SUCCESS;
         public bool SimulateLatePayment { get; set; } = false;
     }
 
     public class WalkInBookingVM
     {
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn sân bóng.")]
+        [Display(Name = "Sân thi đấu")]
         public int FieldId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn khung giờ.")]
+        [Display(Name = "Khung giờ (Ca đá)")]
         public int SlotId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng chọn ngày thi đấu.")]
         [DataType(DataType.Date)]
+        [Display(Name = "Ngày thi đấu")]
         public DateTime BookingDate { get; set; } = DateTime.Today;
 
-        [Required]
-        [Display(Name = "Guest Name")]
+        [Required(ErrorMessage = "Vui lòng nhập tên khách hàng hoặc tên đội.")]
+        [Display(Name = "Tên khách hàng / Đội bóng")]
         public string GuestName { get; set; } = string.Empty;
 
-        [Required]
-        [Phone]
-        [Display(Name = "Guest Phone")]
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại liên hệ.")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
+        [Display(Name = "Số điện thoại liên hệ")]
         public string GuestPhone { get; set; } = string.Empty;
 
-        [Display(Name = "Direct Payment Amount (VND)")]
+        [Display(Name = "Số tiền thu trực tiếp tại quầy (VNĐ)")]
         public decimal? DirectPaymentAmount { get; set; }
 
+        [Display(Name = "Phương thức thu tiền")]
         public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.CASH;
 
+        [Display(Name = "Ghi chú phiếu thu / Mã chứng từ")]
         public string? ReceiptRef { get; set; }
     }
 
@@ -65,16 +73,16 @@ namespace FootballPitchManagement.Models.ViewModels
         public decimal PaidAmount { get; set; }
         public decimal BalanceDue { get; set; }
 
-        [Display(Name = "Collect Remaining Balance (VND)")]
+        [Display(Name = "Thu nốt số tiền còn thiếu tại quầy (VNĐ)")]
         public decimal DirectPaymentCollected { get; set; }
 
-        [Display(Name = "Is Pitch Damaged?")]
+        [Display(Name = "Sân có bị hư hại cơ sở vật chất không?")]
         public bool IsDamaged { get; set; } = false;
 
-        [Display(Name = "Damage Details")]
+        [Display(Name = "Chi tiết biên bản hư hại (Mặt cỏ / Lưới / Đèn)")]
         public string? DamageNote { get; set; }
 
-        [Display(Name = "Mark as Unsettled Debt if not fully paid")]
+        [Display(Name = "Đánh dấu nợ chưa quyết toán nếu khách chưa thanh toán đủ")]
         public bool MarkAsUnsettledDebt { get; set; } = false;
     }
 
@@ -84,12 +92,15 @@ namespace FootballPitchManagement.Models.ViewModels
         public string BookingCode { get; set; } = string.Empty;
         public decimal BalanceDue { get; set; }
 
-        [Required]
-        [Range(1000, 100000000)]
+        [Required(ErrorMessage = "Vui lòng nhập số tiền thu.")]
+        [Range(1000, 100000000, ErrorMessage = "Số tiền thu phải từ 1.000 VNĐ trở lên.")]
+        [Display(Name = "Số tiền thực thu (VNĐ)")]
         public decimal Amount { get; set; }
 
+        [Display(Name = "Hình thức thu tiền")]
         public PaymentMethod Method { get; set; } = PaymentMethod.CASH;
 
+        [Display(Name = "Ghi chú / Số phiếu thu")]
         public string? ReceiptRef { get; set; }
     }
 
@@ -99,8 +110,8 @@ namespace FootballPitchManagement.Models.ViewModels
         public string BookingCode { get; set; } = string.Empty;
         public decimal PaidAmount { get; set; }
 
-        [Required]
-        [Display(Name = "Reason for Cancellation")]
+        [Required(ErrorMessage = "Vui lòng nhập lý do hủy đặt sân.")]
+        [Display(Name = "Lý do hủy đặt sân")]
         public string Reason { get; set; } = string.Empty;
     }
 
@@ -112,10 +123,11 @@ namespace FootballPitchManagement.Models.ViewModels
         public string Reason { get; set; } = string.Empty;
         public RefundType RefundType { get; set; }
 
-        [Required]
-        [Display(Name = "Evidence Proof / Transaction Ref")]
+        [Required(ErrorMessage = "Vui lòng nhập mã giao dịch ngân hàng hoặc số phiếu chi hoàn tiền.")]
+        [Display(Name = "Chứng từ hoàn tiền / Mã giao dịch ngân hàng")]
         public string EvidenceProof { get; set; } = string.Empty;
 
+        [Display(Name = "Kết quả chuyển trả hoàn tiền")]
         public bool IsSuccess { get; set; } = true;
     }
 
@@ -132,4 +144,3 @@ namespace FootballPitchManagement.Models.ViewModels
         public List<RefundRequest> PendingRefundRequests { get; set; } = new List<RefundRequest>();
     }
 }
-

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "ADMIN,Admin")]
     public class AccountManagementController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -34,7 +34,8 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             {
                 account.Status = account.Status == AccountStatus.ACTIVE ? AccountStatus.INACTIVE : AccountStatus.ACTIVE;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Account '{account.Username}' status changed to {account.Status}.";
+                string statusText = account.Status == AccountStatus.ACTIVE ? "Đang hoạt động" : "Bị khóa";
+                TempData["SuccessMessage"] = $"Trạng thái tài khoản '{account.Username}' đã chuyển sang: {statusText}.";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -49,7 +50,14 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             {
                 account.Role = role;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Account '{account.Username}' role updated to {role}.";
+                string roleText = role switch
+                {
+                    RoleType.ADMIN => "Quản trị viên (Admin)",
+                    RoleType.MANAGER => "Quản lý (Manager)",
+                    RoleType.STAFF => "Nhân viên Lễ tân (Staff)",
+                    _ => "Khách hàng (Customer)"
+                };
+                TempData["SuccessMessage"] = $"Vai trò của tài khoản '{account.Username}' đã cập nhật thành: {roleText}.";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -64,10 +72,9 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             {
                 account.PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456");
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Password for '{account.Username}' has been reset to: 123456";
+                TempData["SuccessMessage"] = $"Mật khẩu của tài khoản '{account.Username}' đã được đặt lại thành mặc định: 123456.";
             }
             return RedirectToAction(nameof(Index));
         }
     }
 }
-

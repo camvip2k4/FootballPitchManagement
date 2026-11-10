@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Manager,Admin")]
+    [Authorize(Roles = "MANAGER,Manager,ADMIN,Admin")]
     public class PolicyManagementController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -16,7 +16,7 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: /Admin/PolicyManagement (UC36)
+        // GET: /Admin/PolicyManagement
         public async Task<IActionResult> Index()
         {
             var policies = await _context.BusinessPolicies.OrderBy(p => p.PolicyCode).ToListAsync();
@@ -34,10 +34,9 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
                 policy.ParamValue = paramValue.Trim();
                 policy.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Policy {policy.PolicyCode} ({policy.ParamKey}) updated to {policy.ParamValue} {policy.Unit}.";
+                TempData["SuccessMessage"] = $"Chính sách {policy.PolicyCode} ({policy.Description}) đã cập nhật thành công: {policy.ParamValue} {policy.Unit}.";
             }
             return RedirectToAction(nameof(Index));
         }
     }
 }
-

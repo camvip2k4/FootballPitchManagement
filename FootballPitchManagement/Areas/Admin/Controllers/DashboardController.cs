@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Manager,Admin")]
+    [Authorize(Roles = "MANAGER,Manager,ADMIN,Admin")]
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -32,7 +32,7 @@ namespace FootballPitchManagement.Models.ViewModels
         public TimeSpan EndTime { get; set; }
         public decimal Price { get; set; }
         public bool IsAvailable { get; set; }
-        public string StatusDisplay { get; set; } = "Available"; // Available, Held, Booked, Maintenance
+        public string StatusDisplay { get; set; } = "Còn trống";
         public string BadgeClass { get; set; } = "bg-success";
         public int? CurrentBookingId { get; set; }
         public string? BookingCode { get; set; }
