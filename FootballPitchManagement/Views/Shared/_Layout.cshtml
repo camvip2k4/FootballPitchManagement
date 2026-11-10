@@ -297,16 +297,24 @@
             "STAFF" => "Lễ Tân",
             _ => "Khách Hàng"
         };
-        string roleTitle = roleClaim switch
-        {
-            "ADMIN" => "Quản Trị Viên (Admin)",
-            "MANAGER" => "Quản Lý Cơ Sở (Manager)",
-            "STAFF" => "Nhân Viên Lễ Tân (Staff)",
-            _ => "Khách Hàng Thân Thiết"
-        };
 
+        // Lấy họ và tên người dùng hiển thị chuẩn, tự động nhận diện cả các phiên đăng nhập cũ
         var userFullName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
-        string displayName = !string.IsNullOrWhiteSpace(userFullName) ? userFullName : (User.Identity?.Name ?? "Người dùng");
+        if (string.IsNullOrWhiteSpace(userFullName) || userFullName == "customer" || userFullName == "admin" || userFullName == "manager" || userFullName == "staff")
+        {
+            var accName = User.Identity?.Name;
+            if (accName == "admin") userFullName = "Nguyễn Hoàng Long";
+            else if (accName == "manager") userFullName = "Trần Đình Trọng";
+            else if (accName == "staff") userFullName = "Nguyễn Thu Hà";
+            else if (accName == "customer") userFullName = "Lê Hoàng Nam";
+            else if (!string.IsNullOrWhiteSpace(accName)) userFullName = accName;
+        }
+
+        string displayName = !string.IsNullOrWhiteSpace(userFullName) ? userFullName : "Người dùng";
+        if (displayName.Contains('('))
+        {
+            displayName = displayName.Substring(0, displayName.IndexOf('(')).Trim();
+        }
     }
 
     <header class="header-main sticky-top">
@@ -454,8 +462,7 @@
                                             </div>
                                             <div class="overflow-hidden">
                                                 <div class="fw-bold text-white fs-6 text-truncate">@displayName</div>
-                                                <small class="text-secondary d-block mb-1">@@@User.Identity.Name</small>
-                                                <span class="user-chip-badge @rolePillClass">@roleTitle</span>
+                                                <span class="user-chip-badge @rolePillClass mt-1 d-inline-block">@roleShortTitle</span>
                                             </div>
                                         </div>
                                     </li>

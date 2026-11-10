@@ -117,7 +117,7 @@ namespace FootballPitchManagement.Data
                 Username = "admin",
                 Email = "admin@sportarena.vn",
                 PasswordHash = defaultHash,
-                FullName = "Nguyễn Hoàng Long (Tổng Giám Đốc)",
+                FullName = "Nguyễn Hoàng Long",
                 Phone = "0901112222",
                 Role = RoleType.ADMIN,
                 Status = AccountStatus.ACTIVE
@@ -128,7 +128,7 @@ namespace FootballPitchManagement.Data
                 Username = "manager",
                 Email = "quanly@sportarena.vn",
                 PasswordHash = defaultHash,
-                FullName = "Trần Đình Trọng (Quản Lý Cơ Sở)",
+                FullName = "Trần Đình Trọng",
                 Phone = "0902223333",
                 Role = RoleType.MANAGER,
                 Status = AccountStatus.ACTIVE
@@ -139,7 +139,7 @@ namespace FootballPitchManagement.Data
                 Username = "staff",
                 Email = "letan@sportarena.vn",
                 PasswordHash = defaultHash,
-                FullName = "Nguyễn Thu Hà (Lễ Tân Trực Sân)",
+                FullName = "Nguyễn Thu Hà",
                 Phone = "0903334444",
                 Role = RoleType.STAFF,
                 Status = AccountStatus.ACTIVE
@@ -150,7 +150,7 @@ namespace FootballPitchManagement.Data
                 Username = "customer",
                 Email = "khachhang@gmail.com",
                 PasswordHash = defaultHash,
-                FullName = "Lê Hoàng Nam (Khách Hàng Thân Thiết)",
+                FullName = "Lê Hoàng Nam",
                 Phone = "0987654321",
                 Role = RoleType.CUSTOMER,
                 Status = AccountStatus.ACTIVE
@@ -330,10 +330,10 @@ namespace FootballPitchManagement.Data
             var accounts = context.Accounts.ToList();
             foreach (var a in accounts)
             {
-                if (a.Username == "admin") a.FullName = "Nguyễn Hoàng Long (Tổng Giám Đốc)";
-                else if (a.Username == "manager") a.FullName = "Trần Đình Trọng (Quản Lý Cơ Sở)";
-                else if (a.Username == "staff") a.FullName = "Nguyễn Thu Hà (Lễ Tân Trực Sân)";
-                else if (a.Username == "customer") a.FullName = "Lê Hoàng Nam (Khách Hàng Thân Thiết)";
+                if (a.Username == "admin") a.FullName = "Nguyễn Hoàng Long";
+                else if (a.Username == "manager") a.FullName = "Trần Đình Trọng";
+                else if (a.Username == "staff") a.FullName = "Nguyễn Thu Hà";
+                else if (a.Username == "customer") a.FullName = "Lê Hoàng Nam";
             }
 
             context.SaveChanges();

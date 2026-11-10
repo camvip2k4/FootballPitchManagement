@@ -88,12 +88,12 @@ namespace FootballPitchManagement.Controllers
                 await SignInUserAsync(account);
                 string roleName = targetRole switch
                 {
-                    RoleType.ADMIN => "Quản Trị Viên (Admin)",
-                    RoleType.MANAGER => "Quản Lý Cơ Sở (Manager)",
-                    RoleType.STAFF => "Nhân Viên Lễ Tân (Staff)",
-                    _ => "Khách Hàng (Customer)"
+                    RoleType.ADMIN => "Admin",
+                    RoleType.MANAGER => "Quản Lý",
+                    RoleType.STAFF => "Lễ Tân",
+                    _ => "Khách Hàng"
                 };
-                TempData["SuccessMessage"] = $"Đã đăng nhập với vai trò: {account.FullName} [{roleName}]";
+                TempData["SuccessMessage"] = $"Đăng nhập thành công: {account.FullName} ({roleName})";
 
                 if (account.Role == RoleType.STAFF)
                 {
@@ -180,17 +180,18 @@ namespace FootballPitchManagement.Controllers
 
             var roleTitle = account.Role switch
             {
-                RoleType.ADMIN => "Quản Trị Viên (Admin)",
-                RoleType.MANAGER => "Quản Lý Cơ Sở (Manager)",
-                RoleType.STAFF => "Nhân Viên Lễ Tân (Staff)",
+                RoleType.ADMIN => "Admin",
+                RoleType.MANAGER => "Quản Lý",
+                RoleType.STAFF => "Lễ Tân",
                 _ => "Khách Hàng"
             };
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
-                new Claim(ClaimTypes.Name, account.Username),
+                new Claim(ClaimTypes.Name, account.FullName),
                 new Claim(ClaimTypes.GivenName, account.FullName),
+                new Claim("Username", account.Username),
                 new Claim(ClaimTypes.Role, roleUpper),
                 new Claim(ClaimTypes.Role, rolePascal),
                 new Claim("UserRole", roleUpper),
