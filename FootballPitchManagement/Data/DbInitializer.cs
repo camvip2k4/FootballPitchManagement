@@ -9,15 +9,13 @@ namespace FootballPitchManagement.Data
         {
             try
             {
-                // Verify if Accounts table exists. If not, recreate cleanly with new schema.
                 if (!context.Accounts.Any())
                 {
-                    // Fresh database or schema update
+                    // Fresh or needs recreation
                 }
             }
             catch
             {
-                // Previous schema did not have Accounts table, recreate with complete new schema
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
             }
@@ -26,10 +24,10 @@ namespace FootballPitchManagement.Data
 
             if (context.Accounts.Any())
             {
-                return; // Already seeded
+                return; // Already initialized
             }
 
-            // 1. Seed Business Policies (POL-01 to POL-07, BR-32)
+            // 1. Chính sách kinh doanh & vận hành hệ thống (POL-01 -> POL-07)
             var policies = new List<BusinessPolicy>
             {
                 new BusinessPolicy
@@ -39,7 +37,7 @@ namespace FootballPitchManagement.Data
                     ParamValue = "30",
                     DataType = "Integer",
                     Unit = "%",
-                    Description = "Required prepayment percentage of a booking"
+                    Description = "Tỷ lệ tiền cọc tối thiểu để xác nhận giữ sân"
                 },
                 new BusinessPolicy
                 {
@@ -47,8 +45,8 @@ namespace FootballPitchManagement.Data
                     ParamKey = "HOLD_MINUTES",
                     ParamValue = "15",
                     DataType = "Integer",
-                    Unit = "minutes",
-                    Description = "Duration to hold slot for unconfirmed/pending payment"
+                    Unit = "phút",
+                    Description = "Thời gian tạm giữ chỗ chờ thanh toán đặt cọc"
                 },
                 new BusinessPolicy
                 {
@@ -56,8 +54,8 @@ namespace FootballPitchManagement.Data
                     ParamKey = "CANCEL_CUTOFF_HOURS",
                     ParamValue = "24",
                     DataType = "Integer",
-                    Unit = "hours",
-                    Description = "Cutoff hours before slot start time for customer cancellation"
+                    Unit = "giờ",
+                    Description = "Thời hạn tối thiểu trước giờ đá để khách được hủy sân và nhận lại cọc"
                 },
                 new BusinessPolicy
                 {
@@ -66,7 +64,7 @@ namespace FootballPitchManagement.Data
                     ParamValue = "100",
                     DataType = "Integer",
                     Unit = "%",
-                    Description = "Refund percentage when cancelled before cutoff"
+                    Description = "Tỷ lệ hoàn tiền cọc khi khách hủy đúng hạn"
                 },
                 new BusinessPolicy
                 {
@@ -74,8 +72,8 @@ namespace FootballPitchManagement.Data
                     ParamKey = "CHECKIN_EARLY_MIN",
                     ParamValue = "30",
                     DataType = "Integer",
-                    Unit = "minutes",
-                    Description = "Allowed early arrival window before slot start"
+                    Unit = "phút",
+                    Description = "Thời gian cho phép check-in sớm trước giờ thi đấu"
                 },
                 new BusinessPolicy
                 {
@@ -83,8 +81,8 @@ namespace FootballPitchManagement.Data
                     ParamKey = "CHECKIN_LATE_MIN",
                     ParamValue = "30",
                     DataType = "Integer",
-                    Unit = "minutes",
-                    Description = "Threshold minutes past start time before marking no-show"
+                    Unit = "phút",
+                    Description = "Thời gian trễ tối đa trước khi hệ thống ghi nhận vắng mặt (No-Show)"
                 },
                 new BusinessPolicy
                 {
@@ -92,8 +90,8 @@ namespace FootballPitchManagement.Data
                     ParamKey = "BOOKING_HORIZON_DAYS",
                     ParamValue = "30",
                     DataType = "Integer",
-                    Unit = "days",
-                    Description = "Furthest days in advance customer can book"
+                    Unit = "ngày",
+                    Description = "Số ngày tối đa khách được phép đặt sân trước"
                 },
                 new BusinessPolicy
                 {
@@ -101,22 +99,22 @@ namespace FootballPitchManagement.Data
                     ParamKey = "MAX_PENDING_PER_CUSTOMER",
                     ParamValue = "3",
                     DataType = "Integer",
-                    Unit = "bookings",
-                    Description = "Maximum simultaneous pending-payment bookings allowed per customer"
+                    Unit = "đơn",
+                    Description = "Số lượng đơn đặt giữ chỗ chờ thanh toán tối đa của mỗi khách hàng"
                 }
             };
             context.BusinessPolicies.AddRange(policies);
             context.SaveChanges();
 
-            // 2. Seed Accounts (Password "123456")
+            // 2. Tài khoản mẫu cho hệ thống (Mật khẩu mặc định: 123456)
             string defaultHash = BCrypt.Net.BCrypt.HashPassword("123456");
 
             var admin = new Account
             {
                 Username = "admin",
-                Email = "admin@footballpitch.com",
+                Email = "admin@sportarena.vn",
                 PasswordHash = defaultHash,
-                FullName = "System Administrator",
+                FullName = "Quản Trị Viên Hệ Thống",
                 Phone = "0901112222",
                 Role = RoleType.ADMIN,
                 Status = AccountStatus.ACTIVE
@@ -125,9 +123,9 @@ namespace FootballPitchManagement.Data
             var manager = new Account
             {
                 Username = "manager",
-                Email = "manager@footballpitch.com",
+                Email = "quanly@sportarena.vn",
                 PasswordHash = defaultHash,
-                FullName = "Facility Manager",
+                FullName = "Nguyễn Văn Quản Lý",
                 Phone = "0902223333",
                 Role = RoleType.MANAGER,
                 Status = AccountStatus.ACTIVE
@@ -136,9 +134,9 @@ namespace FootballPitchManagement.Data
             var staff = new Account
             {
                 Username = "staff",
-                Email = "staff@footballpitch.com",
+                Email = "letan@sportarena.vn",
                 PasswordHash = defaultHash,
-                FullName = "Front Desk Staff",
+                FullName = "Trần Thị Lễ Tân",
                 Phone = "0903334444",
                 Role = RoleType.STAFF,
                 Status = AccountStatus.ACTIVE
@@ -147,9 +145,9 @@ namespace FootballPitchManagement.Data
             var customer = new Account
             {
                 Username = "customer",
-                Email = "customer@gmail.com",
+                Email = "khachhang@gmail.com",
                 PasswordHash = defaultHash,
-                FullName = "Nguyen Van A",
+                FullName = "Lê Hoàng Nam",
                 Phone = "0987654321",
                 Role = RoleType.CUSTOMER,
                 Status = AccountStatus.ACTIVE
@@ -158,13 +156,13 @@ namespace FootballPitchManagement.Data
             context.Accounts.AddRange(admin, manager, staff, customer);
             context.SaveChanges();
 
-            // 3. Seed Football Fields
+            // 3. Danh mục sân bóng đá cao cấp Sport Arena
             var field1 = new FootballField
             {
-                Name = "Pitch 5A - Mini Star",
+                Name = "Sân 5A - Mini Stadium",
                 FieldType = FieldType.FIELD_5,
-                Location = "Zone A - South Gate",
-                Description = "High quality synthetic turf with LED night lights for 5-a-side matches.",
+                Location = "Khu A - Cổng số 1, Sân bóng Sport Arena",
+                Description = "Mặt cỏ nhân tạo sợi kim cương nhập khẩu, hệ thống đèn chiếu sáng LED chống chói 300 Lux, có lưới chắn bóng tiêu chuẩn.",
                 OpenTime = new TimeSpan(6, 0, 0),
                 CloseTime = new TimeSpan(23, 0, 0),
                 Status = FieldStatus.AVAILABLE,
@@ -173,10 +171,10 @@ namespace FootballPitchManagement.Data
 
             var field2 = new FootballField
             {
-                Name = "Pitch 7B - Champions Turf",
+                Name = "Sân 7B - Champions Turf",
                 FieldType = FieldType.FIELD_7,
-                Location = "Zone B - Central Area",
-                Description = "Standard 7-a-side pitch with high-grade monofilament grass and covered benches.",
+                Location = "Khu B - Khu trung tâm thể thao",
+                Description = "Sân 7 người tiêu chuẩn thi đấu phong trào, mặt sân êm ái chống chấn thương, có cabin kỹ thuật và khán đài mini có mái che.",
                 OpenTime = new TimeSpan(6, 0, 0),
                 CloseTime = new TimeSpan(23, 0, 0),
                 Status = FieldStatus.AVAILABLE,
@@ -185,10 +183,10 @@ namespace FootballPitchManagement.Data
 
             var field3 = new FootballField
             {
-                Name = "Pitch 11C - Grand Arena",
+                Name = "Sân 11C - Grand Arena",
                 FieldType = FieldType.FIELD_11,
-                Location = "Zone C - Stadium Wing",
-                Description = "Full-size 11-a-side tournament pitch with electronic scoreboard and sound system.",
+                Location = "Khu C - Sân vận động lớn",
+                Description = "Sân bóng 11 người kích thước chuẩn FIFA, trang bị dàn đèn công suất lớn, bảng tỉ số điện tử, dàn âm thanh và phòng thay đồ cao cấp.",
                 OpenTime = new TimeSpan(6, 0, 0),
                 CloseTime = new TimeSpan(23, 0, 0),
                 Status = FieldStatus.AVAILABLE,
@@ -198,15 +196,15 @@ namespace FootballPitchManagement.Data
             context.FootballFields.AddRange(field1, field2, field3);
             context.SaveChanges();
 
-            // 4. Seed Time Slots for Each Field
+            // 4. Các khung giờ thi đấu trong ngày cho từng sân
             var slotDefinitions = new (string name, TimeSpan start, TimeSpan end)[]
             {
-                ("Slot 1 (06:00 - 07:30)", new TimeSpan(6, 0, 0), new TimeSpan(7, 30, 0)),
-                ("Slot 2 (07:30 - 09:00)", new TimeSpan(7, 30, 0), new TimeSpan(9, 0, 0)),
-                ("Slot 3 (15:30 - 17:00)", new TimeSpan(15, 30, 0), new TimeSpan(17, 0, 0)),
-                ("Slot 4 (17:00 - 18:30)", new TimeSpan(17, 0, 0), new TimeSpan(18, 30, 0)),
-                ("Slot 5 (18:30 - 20:00)", new TimeSpan(18, 30, 0), new TimeSpan(20, 0, 0)),
-                ("Slot 6 (20:00 - 21:30)", new TimeSpan(20, 0, 0), new TimeSpan(21, 30, 0))
+                ("Ca 1 (06:00 - 07:30)", new TimeSpan(6, 0, 0), new TimeSpan(7, 30, 0)),
+                ("Ca 2 (07:30 - 09:00)", new TimeSpan(7, 30, 0), new TimeSpan(9, 0, 0)),
+                ("Ca 3 (15:30 - 17:00)", new TimeSpan(15, 30, 0), new TimeSpan(17, 0, 0)),
+                ("Ca 4 (17:00 - 18:30) [Giờ vàng]", new TimeSpan(17, 0, 0), new TimeSpan(18, 30, 0)),
+                ("Ca 5 (18:30 - 20:00) [Giờ vàng]", new TimeSpan(18, 30, 0), new TimeSpan(20, 0, 0)),
+                ("Ca 6 (20:00 - 21:30) [Giờ vàng]", new TimeSpan(20, 0, 0), new TimeSpan(21, 30, 0))
             };
 
             var fields = new[] { field1, field2, field3 };
@@ -226,18 +224,18 @@ namespace FootballPitchManagement.Data
             }
             context.SaveChanges();
 
-            // 5. Seed Pricing Rules (Weekday / Weekend, Normal / Peak)
+            // 5. Cấu hình bảng giá linh hoạt (Ngày thường, Cuối tuần, Khung giờ thường, Khung giờ vàng)
             var allFields = context.FootballFields.ToList();
             foreach (var f in allFields)
             {
                 decimal baseRate = f.FieldType switch
                 {
-                    FieldType.FIELD_5 => 200000m,
-                    FieldType.FIELD_7 => 350000m,
-                    _ => 700000m
+                    FieldType.FIELD_5 => 220000m,
+                    FieldType.FIELD_7 => 380000m,
+                    _ => 750000m
                 };
 
-                // Weekday Normal
+                // Ngày thường - Giờ thường
                 context.PricingRules.Add(new PricingRule
                 {
                     FieldId = f.FieldId,
@@ -249,11 +247,11 @@ namespace FootballPitchManagement.Data
                     EffectiveTo = DateTime.Today.AddYears(1)
                 });
 
-                // Weekday Peak (17:00 onwards)
+                // Ngày thường - Giờ vàng (Từ 17:00)
                 context.PricingRules.Add(new PricingRule
                 {
                     FieldId = f.FieldId,
-                    Price = baseRate * 1.35m,
+                    Price = Math.Round(baseRate * 1.35m / 10000) * 10000,
                     DayType = DayType.WEEKDAY,
                     TimeTier = TimeTier.PEAK,
                     Priority = 2,
@@ -261,11 +259,11 @@ namespace FootballPitchManagement.Data
                     EffectiveTo = DateTime.Today.AddYears(1)
                 });
 
-                // Weekend Normal
+                // Cuối tuần - Giờ thường
                 context.PricingRules.Add(new PricingRule
                 {
                     FieldId = f.FieldId,
-                    Price = baseRate * 1.25m,
+                    Price = Math.Round(baseRate * 1.25m / 10000) * 10000,
                     DayType = DayType.WEEKEND,
                     TimeTier = TimeTier.NORMAL,
                     Priority = 1,
@@ -273,11 +271,11 @@ namespace FootballPitchManagement.Data
                     EffectiveTo = DateTime.Today.AddYears(1)
                 });
 
-                // Weekend Peak
+                // Cuối tuần - Giờ vàng
                 context.PricingRules.Add(new PricingRule
                 {
                     FieldId = f.FieldId,
-                    Price = baseRate * 1.6m,
+                    Price = Math.Round(baseRate * 1.6m / 10000) * 10000,
                     DayType = DayType.WEEKEND,
                     TimeTier = TimeTier.PEAK,
                     Priority = 2,
@@ -287,48 +285,47 @@ namespace FootballPitchManagement.Data
             }
             context.SaveChanges();
 
-            // 6. Seed Service Items
+            // 6. Dịch vụ tiện ích tại sân
             var serviceItems = new ServiceItem[]
             {
-                new ServiceItem { Name = "Aquafina Mineral Water (500ml)", Price = 10000, Unit = "Bottle", IsAvailable = true },
-                new ServiceItem { Name = "Revive Isotonic Drink", Price = 15000, Unit = "Bottle", IsAvailable = true },
-                new ServiceItem { Name = "FIFA Standard Ball Rental", Price = 30000, Unit = "Ball/Match", IsAvailable = true },
-                new ServiceItem { Name = "Training Bib Set (7 pcs)", Price = 50000, Unit = "Set", IsAvailable = true },
-                new ServiceItem { Name = "Professional Referee", Price = 200000, Unit = "Match", IsAvailable = true }
+                new ServiceItem { Name = "Nước khoáng Aquafina (500ml)", Price = 10000, Unit = "Chai", IsAvailable = true },
+                new ServiceItem { Name = "Nước điện giải Revive bù khoáng", Price = 15000, Unit = "Chai", IsAvailable = true },
+                new ServiceItem { Name = "Thuê bóng thi đấu đạt chuẩn FIFA", Price = 30000, Unit = "Quả/Trận", IsAvailable = true },
+                new ServiceItem { Name = "Bộ áo bib phân đội tập luyện (7 áo)", Price = 50000, Unit = "Bộ/Trận", IsAvailable = true },
+                new ServiceItem { Name = "Thuê trọng tài bắt chính chuyên nghiệp", Price = 200000, Unit = "Trận", IsAvailable = true }
             };
             context.ServiceItems.AddRange(serviceItems);
             context.SaveChanges();
 
-            // 7. Seed Sample Bookings for Today & Tomorrow
+            // 7. Tạo sẵn một số đơn đặt sân thực tế cho hôm nay
             var f2Slots = context.TimeSlots.Where(s => s.FieldId == field2.FieldId).ToList();
-            if (f2Slots.Count >= 4)
+            if (f2Slots.Count >= 5)
             {
-                // A confirmed booking for today
+                // Đơn đã thanh toán cọc và xác nhận cho ca 17:00
                 var booking1 = new Booking
                 {
                     BookingCode = "BK-" + DateTime.Today.ToString("yyyyMMdd") + "-001",
                     BookingDate = DateTime.Today,
                     FieldId = field2.FieldId,
-                    SlotId = f2Slots[3].SlotId, // 17:00 - 18:30
+                    SlotId = f2Slots[3].SlotId,
                     AccountId = customer.AccountId,
-                    AgreedPrice = 472500,
-                    RequiredPrepayment = 141750,
-                    PaidAmount = 141750,
-                    BalanceDue = 330750,
+                    AgreedPrice = 510000,
+                    RequiredPrepayment = 153000,
+                    PaidAmount = 153000,
+                    BalanceDue = 357000,
                     SettlementStatus = SettlementStatus.PARTIALLY_PAID,
                     Status = BookingStatus.CONFIRMED,
                     HoldExpiresAt = DateTime.UtcNow.AddHours(2),
                     CreatedAt = DateTime.UtcNow.AddHours(-1)
                 };
-
                 context.Bookings.Add(booking1);
                 context.SaveChanges();
 
                 var payment1 = new Payment
                 {
                     BookingId = booking1.BookingId,
-                    TransactionRef = "TXN-DEMO-001",
-                    Amount = 141750,
+                    TransactionRef = "VNPAY-20261110-098812",
+                    Amount = 153000,
                     Method = PaymentMethod.ONLINE_GATEWAY,
                     Channel = PaymentChannel.ONLINE,
                     Status = PaymentStatus.SUCCESS,
@@ -336,18 +333,18 @@ namespace FootballPitchManagement.Data
                 };
                 context.Payments.Add(payment1);
 
-                // A pending payment booking
+                // Đơn đang tạm giữ chỗ chờ thanh toán cho ca 18:30
                 var booking2 = new Booking
                 {
                     BookingCode = "BK-" + DateTime.Today.ToString("yyyyMMdd") + "-002",
                     BookingDate = DateTime.Today,
                     FieldId = field2.FieldId,
-                    SlotId = f2Slots[4].SlotId, // 18:30 - 20:00
+                    SlotId = f2Slots[4].SlotId,
                     AccountId = customer.AccountId,
-                    AgreedPrice = 472500,
-                    RequiredPrepayment = 141750,
+                    AgreedPrice = 510000,
+                    RequiredPrepayment = 153000,
                     PaidAmount = 0,
-                    BalanceDue = 472500,
+                    BalanceDue = 510000,
                     SettlementStatus = SettlementStatus.UNPAID,
                     Status = BookingStatus.PENDING_PAYMENT,
                     HoldExpiresAt = DateTime.UtcNow.AddMinutes(12),
@@ -358,8 +355,8 @@ namespace FootballPitchManagement.Data
                 context.Notifications.Add(new Notification
                 {
                     AccountId = customer.AccountId,
-                    Type = "BOOKING_CONFIRMED",
-                    Message = $"Your booking {booking1.BookingCode} for {field2.Name} on {DateTime.Today:dd/MM/yyyy} is confirmed!",
+                    Type = "XÁC NHẬN ĐẶT SÂN",
+                    Message = $"Đơn đặt sân {booking1.BookingCode} tại {field2.Name} ngày {DateTime.Today:dd/MM/yyyy} đã được xác nhận thành công!",
                     IsRead = false,
                     CreatedAt = DateTime.UtcNow.AddHours(-1)
                 });

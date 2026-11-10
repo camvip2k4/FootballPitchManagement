@@ -1,32 +1,32 @@
 @model IEnumerable<FootballPitchManagement.Models.Entities.RefundRequest>
 
 @{
-    ViewData["Title"] = "Refund Queue (UC34)";
+    ViewData["Title"] = "Hàng Đợi Xử Lý Hoàn Tiền";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold mb-1"><i class="bi bi-arrow-counterclockwise text-info"></i> Refund Management Queue (UC34)</h2>
-        <p class="text-muted mb-0">Review and execute customer, facility, and late-payment refund requests</p>
+        <h2 class="fw-bold mb-1 text-dark"><i class="bi bi-arrow-counterclockwise text-primary"></i> Hàng Đợi Xử Lý Hoàn Tiền</h2>
+        <p class="text-muted mb-0">Duyệt và thực hiện chuyển trả tiền cọc cho khách hàng hủy đúng hạn, hủy do thời tiết hoặc thanh toán muộn</p>
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Back to Front Desk
+        <i class="bi bi-arrow-left me-1"></i> Quay lại bàn lễ tân
     </a>
 </div>
 
-<div class="table-responsive bg-white rounded shadow-sm p-3">
+<div class="table-responsive bg-white rounded-4 shadow-sm p-3">
     <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
             <tr>
-                <th>Refund Code</th>
-                <th>Booking Code</th>
-                <th>Pitch</th>
-                <th>Refund Amount</th>
-                <th>Type</th>
-                <th>Reason</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th class="text-center">Action</th>
+                <th>Mã Yêu Cầu</th>
+                <th>Mã Đơn Đặt</th>
+                <th>Sân Bóng</th>
+                <th>Số Tiền Hoàn</th>
+                <th>Phân Loại</th>
+                <th>Lý Do Hủy</th>
+                <th>Trạng Thái</th>
+                <th>Thời Gian</th>
+                <th class="text-center">Thao Tác</th>
             </tr>
         </thead>
         <tbody>
@@ -37,30 +37,42 @@
                     <tr>
                         <td class="fw-bold text-primary">@r.RefundCode</td>
                         <td>@(r.Booking?.BookingCode ?? "N/A")</td>
-                        <td>@(r.Booking?.Field?.Name ?? "Field")</td>
-                        <td class="fw-bold text-success fs-6">@r.Amount.ToString("N0") VND</td>
+                        <td>@(r.Booking?.Field?.Name ?? "Sân bóng")</td>
+                        <td class="fw-bold text-success fs-6">@r.Amount.ToString("N0") đ</td>
                         <td>
-                            <span class="badge @(r.RefundType == FootballPitchManagement.Models.Enums.RefundType.FACILITY_CANCEL ? "bg-danger" : (r.RefundType == FootballPitchManagement.Models.Enums.RefundType.LATE_PAYMENT ? "bg-warning text-dark" : "bg-info text-dark"))">
-                                @r.RefundType
-                            </span>
+                            @{
+                                (string rBadge, string rType) = r.RefundType switch
+                                {
+                                    FootballPitchManagement.Models.Enums.RefundType.FACILITY_CANCEL => ("bg-danger", "Sân hủy sự cố (100%)"),
+                                    FootballPitchManagement.Models.Enums.RefundType.LATE_PAYMENT => ("bg-warning text-dark", "Thanh toán muộn (100%)"),
+                                    _ => ("bg-info text-dark", "Khách hủy đúng hạn")
+                                };
+                            }
+                            <span class="badge @rBadge">@rType</span>
                         </td>
                         <td><small class="text-muted">@r.Reason</small></td>
                         <td>
-                            <span class="badge @(r.Status == FootballPitchManagement.Models.Enums.RefundStatus.SUCCESS ? "bg-success" : (r.Status == FootballPitchManagement.Models.Enums.RefundStatus.PENDING ? "bg-warning text-dark" : "bg-danger"))">
-                                @r.Status
-                            </span>
+                            @{
+                                (string sBadge, string sText) = r.Status switch
+                                {
+                                    FootballPitchManagement.Models.Enums.RefundStatus.SUCCESS => ("bg-success", "Đã hoàn tất"),
+                                    FootballPitchManagement.Models.Enums.RefundStatus.PENDING => ("bg-warning text-dark", "Chờ duyệt chi"),
+                                    _ => ("bg-danger", "Thất bại")
+                                };
+                            }
+                            <span class="badge @sBadge">@sText</span>
                         </td>
                         <td><small>@r.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small></td>
                         <td class="text-center">
                             @if (r.Status == FootballPitchManagement.Models.Enums.RefundStatus.PENDING)
                             {
-                                <a asp-action="ProcessRefund" asp-route-id="@r.RefundId" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-gear"></i> Process
+                                <a asp-action="ProcessRefund" asp-route-id="@r.RefundId" class="btn btn-primary btn-sm px-3 fw-bold">
+                                    <i class="bi bi-check2-circle me-1"></i> Xử Lý
                                 </a>
                             }
                             else
                             {
-                                <small class="text-muted">Proof: @r.EvidenceProof</small>
+                                <small class="text-muted d-block">Chứng từ: @r.EvidenceProof</small>
                             }
                         </td>
                     </tr>
@@ -69,10 +81,9 @@
             else
             {
                 <tr>
-                    <td colspan="9" class="text-center py-4 text-muted">No refund requests in the queue.</td>
+                    <td colspan="9" class="text-center py-5 text-muted">Hiện không có yêu cầu hoàn tiền nào cần xử lý.</td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
-

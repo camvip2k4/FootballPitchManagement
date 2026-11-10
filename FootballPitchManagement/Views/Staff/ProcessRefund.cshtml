@@ -1,32 +1,34 @@
 @model FootballPitchManagement.Models.ViewModels.ProcessRefundVM
 
 @{
-    ViewData["Title"] = "Process Refund (UC34)";
+    ViewData["Title"] = "Duyệt & Xử Lý Hoàn Tiền";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-info text-white py-3">
-                <h4 class="mb-0"><i class="bi bi-wallet2"></i> Process Refund Request (UC34)</h4>
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white py-3 px-4">
+                <h4 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-wallet2 me-2"></i> Xác Nhận Lệnh Hoàn Tiền
+                </h4>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-light border mb-4">
+                <div class="alert alert-light border rounded-3 mb-4">
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Refund Code:</span>
-                        <strong class="text-primary">@Model.RefundCode</strong>
+                        <span class="text-muted">Mã yêu cầu hoàn:</span>
+                        <strong class="text-primary fs-6">@Model.RefundCode</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Refund Amount:</span>
-                        <strong class="text-success fs-5">@Model.Amount.ToString("N0") VND</strong>
+                        <span class="text-muted">Số tiền hoàn chi trả:</span>
+                        <strong class="text-success fs-4">@Model.Amount.ToString("N0") đ</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Type:</span>
+                        <span class="text-muted">Phân loại:</span>
                         <span class="badge bg-secondary">@Model.RefundType</span>
                     </div>
                     <div>
-                        <span class="text-muted">Reason:</span>
-                        <p class="mb-0 small text-dark fw-semibold">@Model.Reason</p>
+                        <span class="text-muted">Lý do hủy/hoàn:</span>
+                        <p class="mb-0 small text-dark fw-bold">@Model.Reason</p>
                     </div>
                 </div>
 
@@ -36,24 +38,24 @@
                     <input type="hidden" asp-for="Amount" />
 
                     <div class="mb-3">
-                        <label asp-for="EvidenceProof" class="form-label fw-bold">Evidence Proof / Banking Reference / Cash Receipt Slip:</label>
-                        <input asp-for="EvidenceProof" class="form-control" placeholder="e.g. Bank Ref #VNPAY-REF-9988 or Signed cash slip" />
+                        <label asp-for="EvidenceProof" class="form-label fw-bold">Chứng từ hoàn tiền / Mã giao dịch ngân hàng / Phiếu chi:</label>
+                        <input asp-for="EvidenceProof" class="form-control form-control-lg" placeholder="Ví dụ: FT263158912348 hoặc Phiếu chi số 08" />
                         <span asp-validation-for="EvidenceProof" class="text-danger"></span>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Refund Execution Result</label>
-                        <select asp-for="IsSuccess" class="form-select">
-                            <option value="true">Mark as SUCCESS (Refund disbursed to customer)</option>
-                            <option value="false">Mark as FAILED (Transfer failed / Customer dispute)</option>
+                        <label class="form-label fw-bold">Kết quả thực hiện chuyển trả:</label>
+                        <select asp-for="IsSuccess" class="form-select form-select-lg">
+                            <option value="true">Thành công (Đã chuyển khoản trả lại tiền cho khách)</option>
+                            <option value="false">Thất bại (Giao dịch lỗi / Khách khiếu nại)</option>
                         </select>
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-info text-white btn-lg fw-semibold py-2">
-                            <i class="bi bi-check-all"></i> Submit Refund Record
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold py-2 shadow-sm">
+                            <i class="bi bi-check-circle me-1"></i> Xác Nhận Hoàn Tất Lệnh Hoàn Tiền
                         </button>
-                        <a asp-action="RefundQueue" class="btn btn-outline-secondary">Cancel</a>
+                        <a asp-action="RefundQueue" class="btn btn-outline-secondary py-2">Hủy bỏ</a>
                     </div>
                 </form>
             </div>
@@ -64,4 +66,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

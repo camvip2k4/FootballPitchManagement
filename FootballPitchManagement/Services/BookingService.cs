@@ -85,7 +85,7 @@ namespace FootballPitchManagement.Services
                 .ToListAsync();
         }
 
-        // UC10: Book Football Field (Online by Customer)
+        // Đặt sân trực tuyến từ phía khách hàng (UC10)
         public async Task<(bool Success, string Message, Booking? Booking)> CreateOnlineBookingAsync(
             int fieldId,
             int slotId,
@@ -97,13 +97,13 @@ namespace FootballPitchManagement.Services
 
             if (targetDate < today)
             {
-                return (false, "Cannot book a date in the past.", null);
+                return (false, "Không thể đặt lịch thi đấu cho ngày trong quá khứ.", null);
             }
 
             var horizonDays = await _policyService.GetBookingHorizonDaysAsync();
             if (targetDate > today.AddDays(horizonDays))
             {
-                return (false, $"Cannot book more than {horizonDays} days in advance (POL-05).", null);
+                return (false, $"Hệ thống chỉ nhận đặt trước tối đa trong vòng {horizonDays} ngày.", null);
             }
 
             var maxPending = await _policyService.GetMaxPendingPerCustomerAsync();
@@ -114,13 +114,13 @@ namespace FootballPitchManagement.Services
 
             if (currentPending >= maxPending)
             {
-                return (false, $"You have reached the maximum allowed pending bookings ({maxPending}). Please complete or cancel pending holds first (BR-32).", null);
+                return (false, $"Bạn đang có {currentPending} đơn giữ chỗ chưa thanh toán (tối đa {maxPending} đơn). Vui lòng hoàn tất hoặc hủy các đơn cũ trước khi đặt tiếp.", null);
             }
 
             var isAvailable = await _availabilityChecker.IsSlotAvailableAsync(fieldId, slotId, targetDate);
             if (!isAvailable)
             {
-                return (false, "The selected slot is no longer available. Please choose another slot.", null);
+                return (false, "Khung giờ này vừa có người đặt hoặc đang trong thời gian giữ chỗ. Vui lòng chọn khung giờ khác.", null);
             }
 
             var price = await _pricingService.CalculatePriceAsync(fieldId, slotId, targetDate);
@@ -152,13 +152,13 @@ namespace FootballPitchManagement.Services
 
             await _notificationService.SendNotificationAsync(
                 accountId,
-                "HOLD_STARTED",
-                $"Booking {booking.BookingCode} created. Slot is held for {holdMinutes} minutes. Please complete prepayment of {requiredPrepayment:N0} VND.");
+                "GIỮ_CHỖ_THÀNH_CÔNG",
+                $"Đơn đặt sân {booking.BookingCode} đã được tạo. Sân được tạm giữ cho bạn trong {holdMinutes} phút. Vui lòng thanh toán cọc {requiredPrepayment:N0} đ để hoàn tất xác nhận.");
 
-            return (true, "Booking hold created successfully.", booking);
+            return (true, "Tạo đơn giữ chỗ thành công.", booking);
         }
 
-        // UC37: Create Booking for Customer (Front Desk Walk-in / Phone)
+        // Đặt sân cho khách tại quầy hoặc qua điện thoại (UC37)
         public async Task<(bool Success, string Message, Booking? Booking)> CreateWalkInBookingAsync(
             int fieldId,
             int slotId,
@@ -174,7 +174,7 @@ namespace FootballPitchManagement.Services
             var isAvailable = await _availabilityChecker.IsSlotAvailableAsync(fieldId, slotId, targetDate);
             if (!isAvailable)
             {
-                return (false, "The selected slot is not available.", null);
+                return (false, "Khung giờ được chọn hiện không còn trống.", null);
             }
 
             var price = await _pricingService.CalculatePriceAsync(fieldId, slotId, targetDate);
@@ -189,11 +189,11 @@ namespace FootballPitchManagement.Services
             var isConfirmed = paid >= requiredPrepayment;
             var booking = new Booking
             {
-                BookingCode = "WI-" + targetDate.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..4].ToUpper(),
+                BookingCode = "VL-" + targetDate.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..4].ToUpper(),
                 BookingDate = targetDate,
                 FieldId = fieldId,
                 SlotId = slotId,
-                AccountId = null, // Walk-in customer without account
+                AccountId = null,
                 GuestName = guestName,
                 GuestPhone = guestPhone,
                 AgreedPrice = price,
@@ -214,7 +214,7 @@ namespace FootballPitchManagement.Services
                 var payment = new Payment
                 {
                     BookingId = booking.BookingId,
-                    TransactionRef = "DIR-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                    TransactionRef = "QUAY-" + DateTime.Now.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..6].ToUpper(),
                     Amount = paid,
                     Method = method ?? PaymentMethod.CASH,
                     Channel = PaymentChannel.DIRECT,
@@ -226,10 +226,10 @@ namespace FootballPitchManagement.Services
                 await _context.SaveChangesAsync();
             }
 
-            return (true, isConfirmed ? "Counter booking confirmed with direct payment." : "Counter booking created (Pending payment).", booking);
+            return (true, isConfirmed ? "Đặt sân tại quầy và xác nhận thành công." : "Tạo đơn đặt sân tại quầy thành công (Chờ thu cọc).", booking);
         }
 
-        // UC13: Cancel Booking by Customer
+        // Khách hàng tự hủy đặt sân (UC13)
         public async Task<(bool Success, string Message)> CancelByCustomerAsync(
             int bookingId,
             int accountId,
@@ -241,7 +241,7 @@ namespace FootballPitchManagement.Services
 
             if (booking == null)
             {
-                return (false, "Booking not found.");
+                return (false, "Không tìm thấy thông tin đơn đặt sân.");
             }
 
             if (booking.Status == BookingStatus.CANCELLED ||
@@ -249,22 +249,22 @@ namespace FootballPitchManagement.Services
                 booking.Status == BookingStatus.CHECKED_IN ||
                 booking.Status == BookingStatus.NO_SHOW)
             {
-                return (false, $"Cannot cancel a booking with status '{booking.Status}'.");
+                return (false, $"Không thể hủy đơn đặt sân đang ở trạng thái '{booking.Status}'.");
             }
 
             var now = DateTime.UtcNow;
 
-            // If pending payment or payment failed, simply cancel and release hold
+            // Nếu đơn chưa thanh toán cọc hoặc thanh toán thất bại: hủy và giải phóng chỗ ngay lập tức
             if (booking.Status == BookingStatus.PENDING_PAYMENT || booking.Status == BookingStatus.PAYMENT_FAILED)
             {
                 booking.Status = BookingStatus.CANCELLED;
                 booking.CancellationType = CancellationType.CUSTOMER;
                 booking.CancelReason = reason;
                 await _context.SaveChangesAsync();
-                return (true, "Booking hold cancelled successfully.");
+                return (true, "Đã hủy đơn giữ chỗ thành công.");
             }
 
-            // If confirmed, check cutoff hours
+            // Nếu đơn đã xác nhận (đã có tiền cọc), kiểm tra mốc thời gian tối thiểu 24h
             if (booking.Status == BookingStatus.CONFIRMED && booking.TimeSlot != null)
             {
                 var slotDateTime = booking.BookingDate.Date.Add(booking.TimeSlot.StartTime);
@@ -273,14 +273,14 @@ namespace FootballPitchManagement.Services
 
                 if (DateTime.Now > cutoffTime)
                 {
-                    return (false, $"Cancellation rejected: You can only cancel at least {cutoffHours} hours before the match time (POL-03).");
+                    return (false, $"Từ chối hủy đơn: Khách chỉ được hủy trước giờ đá tối thiểu {cutoffHours} tiếng theo quy định chung.");
                 }
 
                 booking.Status = BookingStatus.CANCELLED;
                 booking.CancellationType = CancellationType.CUSTOMER;
                 booking.CancelReason = reason;
 
-                // Create RefundRequest if paid
+                // Tự động tạo yêu cầu hoàn tiền nếu khách đã trả tiền
                 if (booking.PaidAmount > 0)
                 {
                     var refundPercent = await _policyService.GetRefundPercentAsync();
@@ -291,7 +291,7 @@ namespace FootballPitchManagement.Services
                         RefundCode = "REF-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
                         BookingId = booking.BookingId,
                         Amount = refundAmount,
-                        Reason = string.IsNullOrWhiteSpace(reason) ? "Customer cancelled before cutoff" : reason,
+                        Reason = string.IsNullOrWhiteSpace(reason) ? "Khách hủy sân đúng hạn" : reason,
                         RefundType = RefundType.CUSTOMER_CANCEL,
                         Status = RefundStatus.PENDING,
                         CreatedAt = now
@@ -300,18 +300,18 @@ namespace FootballPitchManagement.Services
 
                     await _notificationService.SendNotificationAsync(
                         accountId,
-                        "CANCELLATION_REFUND",
-                        $"Booking {booking.BookingCode} was cancelled. A refund of {refundAmount:N0} VND has been queued for review.");
+                        "YÊU_CẦU_HOÀN_TIỀN",
+                        $"Đơn {booking.BookingCode} đã được hủy. Yêu cầu hoàn lại {refundAmount:N0} đ ({refundPercent}%) đã được chuyển đến ban quản lý xử lý.");
                 }
 
                 await _context.SaveChangesAsync();
-                return (true, "Booking cancelled successfully. Refund request has been queued.");
+                return (true, "Hủy đặt sân thành công. Yêu cầu hoàn tiền đã được đưa vào hàng đợi xử lý.");
             }
 
-            return (false, "Unable to cancel booking.");
+            return (false, "Không thể hủy đơn đặt sân.");
         }
 
-        // UC39: Cancel Booking by Facility (Manager Emergency / Weather / Maintenance)
+        // Ban quản lý hủy sân do sự cố thời tiết, bảo trì đột xuất (UC39)
         public async Task<(bool Success, string Message)> CancelByFacilityAsync(
             int bookingId,
             int managerAccountId,
@@ -320,12 +320,12 @@ namespace FootballPitchManagement.Services
             var booking = await _context.Bookings.FindAsync(bookingId);
             if (booking == null)
             {
-                return (false, "Booking not found.");
+                return (false, "Không tìm thấy đơn đặt sân.");
             }
 
             if (booking.Status == BookingStatus.CANCELLED || booking.Status == BookingStatus.COMPLETED)
             {
-                return (false, $"Cannot cancel booking in status {booking.Status}.");
+                return (false, $"Không thể hủy đơn đặt sân đang ở trạng thái {booking.Status}.");
             }
 
             var now = DateTime.UtcNow;
@@ -333,15 +333,15 @@ namespace FootballPitchManagement.Services
             booking.CancellationType = CancellationType.FACILITY;
             booking.CancelReason = reason;
 
-            // Facility cancellation always grants 100% full refund of all paid money!
+            // Hủy do sự cố từ phía sân: luôn hoàn trả 100% toàn bộ số tiền khách đã thanh toán!
             if (booking.PaidAmount > 0)
             {
                 var refund = new RefundRequest
                 {
-                    RefundCode = "REF-FAC-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                    RefundCode = "REF-SAN-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
                     BookingId = booking.BookingId,
                     Amount = booking.PaidAmount,
-                    Reason = $"Facility cancelled by management: {reason}",
+                    Reason = $"Sân bóng hủy lịch do sự cố/thời tiết: {reason}",
                     RefundType = RefundType.FACILITY_CANCEL,
                     Status = RefundStatus.PENDING,
                     CreatedAt = now
@@ -355,14 +355,14 @@ namespace FootballPitchManagement.Services
             {
                 await _notificationService.SendNotificationAsync(
                     booking.AccountId.Value,
-                    "FACILITY_CANCELLED",
-                    $"Your booking {booking.BookingCode} was cancelled by the facility due to: {reason}. Full refund of {booking.PaidAmount:N0} VND has been queued.");
+                    "HỦY_LỊCH_DO_SỰ_CỐ_SÂN",
+                    $"Rất tiếc! Đơn đặt sân {booking.BookingCode} phải hủy do: {reason}. Toàn bộ số tiền {booking.PaidAmount:N0} đ sẽ được hoàn trả 100% cho bạn.");
             }
 
-            return (true, "Booking cancelled by facility. 100% refund queued.");
+            return (true, "Hủy lịch thành công do sự cố sân bãi. Hệ thống đã tạo yêu cầu hoàn tiền 100%.");
         }
 
-        // UC19: Check In Customer
+        // Check-in đón khách vào sân (UC19)
         public async Task<(bool Success, string Message)> CheckInCustomerAsync(
             int bookingId,
             int staffAccountId)
@@ -374,23 +374,23 @@ namespace FootballPitchManagement.Services
 
             if (booking == null)
             {
-                return (false, "Booking not found.");
+                return (false, "Không tìm thấy đơn đặt sân.");
             }
 
             if (booking.Status != BookingStatus.CONFIRMED)
             {
-                return (false, $"Customer cannot check in. Booking status is '{booking.Status}' (must be CONFIRMED).");
+                return (false, $"Không thể check-in. Đơn đặt sân đang ở trạng thái '{booking.Status}' (yêu cầu phải là Đã xác nhận).");
             }
 
             if (booking.Field == null || booking.Field.Status != FieldStatus.AVAILABLE)
             {
-                return (false, $"Field '{booking.Field?.Name}' is currently {booking.Field?.Status}. Cannot check in.");
+                return (false, $"Sân '{booking.Field?.Name}' hiện đang ở trạng thái {booking.Field?.Status}. Không thể nhận khách vào sân.");
             }
 
             booking.Status = BookingStatus.CHECKED_IN;
             booking.CheckedInAt = DateTime.UtcNow;
 
-            // Operational status of field becomes OCCUPIED
+            // Cập nhật trạng thái sân sang: ĐANG SỬ DỤNG
             booking.Field.Status = FieldStatus.OCCUPIED;
 
             await _context.SaveChangesAsync();
@@ -399,14 +399,14 @@ namespace FootballPitchManagement.Services
             {
                 await _notificationService.SendNotificationAsync(
                     booking.AccountId.Value,
-                    "CHECKED_IN",
-                    $"You have checked in for booking {booking.BookingCode} at {booking.Field.Name}. Enjoy your match!");
+                    "CHECK_IN_THÀNH_CÔNG",
+                    $"Bạn đã check-in thành công tại {booking.Field.Name}. Chúc đội bạn có một trận đấu tuyệt vời!");
             }
 
-            return (true, $"Customer checked in successfully. Pitch '{booking.Field.Name}' marked as OCCUPIED.");
+            return (true, $"Khách đã check-in thành công. Sân '{booking.Field.Name}' chuyển sang trạng thái ĐANG THI ĐẤU.");
         }
 
-        // UC20: Check Out Customer
+        // Check-out nghiệm thu sân và thanh quyết toán (UC20)
         public async Task<(bool Success, string Message)> CheckOutCustomerAsync(
             int bookingId,
             bool isDamaged,
@@ -421,12 +421,12 @@ namespace FootballPitchManagement.Services
 
             if (booking == null)
             {
-                return (false, "Booking not found.");
+                return (false, "Không tìm thấy đơn đặt sân.");
             }
 
             if (booking.Status != BookingStatus.CHECKED_IN)
             {
-                return (false, $"Booking must be in CHECKED_IN status to check out (current: {booking.Status}).");
+                return (false, $"Đơn đặt sân phải đang ở trạng thái Đang sử dụng mới được check-out (hiện tại: {booking.Status}).");
             }
 
             var now = DateTime.UtcNow;
@@ -436,12 +436,12 @@ namespace FootballPitchManagement.Services
                 var payment = new Payment
                 {
                     BookingId = booking.BookingId,
-                    TransactionRef = "CO-PAY-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                    TransactionRef = "CHECKOUT-" + DateTime.Now.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..6].ToUpper(),
                     Amount = directPaymentCollected,
                     Method = PaymentMethod.CASH,
                     Channel = PaymentChannel.DIRECT,
                     Status = PaymentStatus.SUCCESS,
-                    ReceiptRef = "Check-out direct payment",
+                    ReceiptRef = "Thanh toán phần tiền còn lại khi trả sân",
                     PaidAt = now
                 };
                 _context.Payments.Add(payment);
@@ -462,13 +462,13 @@ namespace FootballPitchManagement.Services
             booking.Status = BookingStatus.COMPLETED;
             booking.CheckedOutAt = now;
 
-            // Update Field Operational Status
+            // Nghiệm thu hiện trạng mặt sân
             if (booking.Field != null)
             {
                 if (isDamaged)
                 {
                     booking.Field.Status = FieldStatus.MAINTENANCE;
-                    booking.Field.Description += $" [Damage noted at checkout on {now:yyyy-MM-dd HH:mm}: {damageNote}]";
+                    booking.Field.Description += $" [Ghi nhận hư hỏng sau trận lúc {now:dd/MM/yyyy HH:mm}: {damageNote}]";
                 }
                 else
                 {
@@ -482,14 +482,14 @@ namespace FootballPitchManagement.Services
             {
                 await _notificationService.SendNotificationAsync(
                     booking.AccountId.Value,
-                    "COMPLETED",
-                    $"Check-out completed for {booking.BookingCode}. Thank you for playing with us!");
+                    "HOÀN_TẤT_TRẬN_ĐẤU",
+                    $"Đã hoàn tất thủ tục trả sân cho đơn {booking.BookingCode}. Cảm ơn bạn đã lựa chọn Sport Arena!");
             }
 
-            return (true, "Check-out completed successfully.");
+            return (true, "Hoàn tất thủ tục check-out và thanh quyết toán thành công.");
         }
 
-        // UC35: Record No-Show
+        // Ghi nhận khách không đến (No-Show - UC35)
         public async Task<(bool Success, string Message)> RecordNoShowAsync(
             int bookingId,
             int staffAccountId)
@@ -500,19 +500,19 @@ namespace FootballPitchManagement.Services
 
             if (booking == null)
             {
-                return (false, "Booking not found.");
+                return (false, "Không tìm thấy đơn đặt sân.");
             }
 
             if (booking.Status != BookingStatus.CONFIRMED)
             {
-                return (false, $"Cannot record no-show for booking with status '{booking.Status}'.");
+                return (false, $"Không thể ghi nhận vắng mặt cho đơn đang ở trạng thái '{booking.Status}'.");
             }
 
             var now = DateTime.UtcNow;
             booking.Status = BookingStatus.NO_SHOW;
             booking.NoShowAt = now;
 
-            // Retain paid amount per policy POL-04, no refund created
+            // Giữ lại tiền cọc theo điều khoản chính sách, giải phóng sân về trạng thái TRỐNG
             if (booking.Field != null && booking.Field.Status == FieldStatus.OCCUPIED)
             {
                 booking.Field.Status = FieldStatus.AVAILABLE;
@@ -524,11 +524,11 @@ namespace FootballPitchManagement.Services
             {
                 await _notificationService.SendNotificationAsync(
                     booking.AccountId.Value,
-                    "NO_SHOW",
-                    $"Booking {booking.BookingCode} was marked as No-Show due to arrival window expiration. Prepayment retained per policy.");
+                    "VẮNG_MẶT_NO_SHOW",
+                    $"Đơn {booking.BookingCode} đã được ghi nhận No-Show do quá thời gian vào sân. Tiền cọc được giữ lại theo quy định.");
             }
 
-            return (true, "Booking recorded as No-Show. Paid amount retained.");
+            return (true, "Đã ghi nhận khách vắng mặt (No-Show). Tiền đặt cọc được giữ lại theo quy chế.");
         }
     }
 }

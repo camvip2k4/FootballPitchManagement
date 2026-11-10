@@ -1,51 +1,53 @@
 @model FootballPitchManagement.Models.ViewModels.CancelBookingVM
 
 @{
-    ViewData["Title"] = "Cancel Booking (UC13)";
+    ViewData["Title"] = "Hủy Lịch Đặt Sân & Yêu Cầu Hoàn Cọc";
     var booking = (FootballPitchManagement.Models.Entities.Booking)ViewBag.Booking;
     int cutoffHours = (int)ViewBag.CutoffHours;
     int refundPercent = (int)ViewBag.RefundPercent;
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm border-danger">
-            <div class="card-header bg-danger text-white py-3">
-                <h4 class="mb-0"><i class="bi bi-x-octagon"></i> Cancel Booking (UC13)</h4>
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-danger text-white py-3 px-4">
+                <h4 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-x-octagon-fill me-2"></i> Hủy Lịch Đặt Sân Thi Đấu
+                </h4>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-warning mb-4">
-                    <h6 class="fw-bold"><i class="bi bi-exclamation-triangle"></i> Cancellation Policy (POL-03):</h6>
-                    <p class="small mb-1">
-                        - Customer cancellation must be requested at least <strong>@cutoffHours hours</strong> before the scheduled match start time.
+                <div class="alert alert-warning border-0 rounded-3 mb-4 bg-warning bg-opacity-10">
+                    <h6 class="fw-bold text-dark mb-1"><i class="bi bi-shield-exclamation me-1 text-warning"></i> Chính Sách Hủy Đặt Sân:</h6>
+                    <p class="small text-secondary mb-1">
+                        - Khách hàng được phép hủy lịch trước giờ thi đấu tối thiểu <strong>@cutoffHours tiếng</strong>.
                     </p>
-                    <p class="small mb-0">
-                        - Eligible cancellations will receive a <strong>@refundPercent% refund</strong> of any paid amount, automatically queued for review.
+                    <p class="small text-secondary mb-0">
+                        - Đơn hủy hợp lệ sẽ được tự động đưa vào danh sách hoàn lại <strong>@refundPercent%</strong> tiền đặt cọc.
                     </p>
                 </div>
 
-                <div class="card bg-light border-0 mb-4">
-                    <div class="card-body">
+                <div class="card bg-light border-0 rounded-3 mb-4">
+                    <div class="card-body p-3">
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Booking Code:</div>
-                            <div class="col-sm-8 fw-bold">@booking.BookingCode</div>
+                            <div class="col-sm-4 text-muted">Mã đơn đặt:</div>
+                            <div class="col-sm-8 fw-bold text-dark">@booking.BookingCode</div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Field:</div>
-                            <div class="col-sm-8">@booking.Field?.Name</div>
+                            <div class="col-sm-4 text-muted">Sân bóng:</div>
+                            <div class="col-sm-8 fw-bold">@booking.Field?.Name</div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Match Date:</div>
+                            <div class="col-sm-4 text-muted">Lịch thi đấu:</div>
                             <div class="col-sm-8">@booking.BookingDate.ToString("dd/MM/yyyy") (@booking.TimeSlot?.SlotName)</div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Paid Amount:</div>
-                            <div class="col-sm-8 text-success fw-bold">@booking.PaidAmount.ToString("N0") VND</div>
+                            <div class="col-sm-4 text-muted">Số tiền đã cọc:</div>
+                            <div class="col-sm-8 text-success fw-bold">@booking.PaidAmount.ToString("N0") đ</div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-4 text-muted">Estimated Refund:</div>
-                            <div class="col-sm-8 fw-bold text-primary">
-                                @((booking.PaidAmount * refundPercent / 100m).ToString("N0")) VND (@refundPercent%)
+                            <div class="col-sm-4 text-muted">Số tiền được hoàn:</div>
+                            <div class="col-sm-8 fw-bold text-primary fs-5">
+                                @((booking.PaidAmount * refundPercent / 100m).ToString("N0")) đ (@refundPercent%)
                             </div>
                         </div>
                     </div>
@@ -55,17 +57,17 @@
                     <input type="hidden" asp-for="BookingId" />
                     <input type="hidden" asp-for="BookingCode" />
 
-                    <div class="mb-3">
-                        <label asp-for="Reason" class="form-label fw-bold">Please specify your cancellation reason:</label>
-                        <textarea asp-for="Reason" class="form-control" rows="3" placeholder="e.g. Schedule conflict, bad weather, injured players..."></textarea>
+                    <div class="mb-4">
+                        <label asp-for="Reason" class="form-label fw-bold">Lý do hủy lịch thi đấu:</label>
+                        <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Ví dụ: Đội bận đột xuất, thời tiết xấu, chấn thương..."></textarea>
                         <span asp-validation-for="Reason" class="text-danger"></span>
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-danger btn-lg fw-semibold py-2">
-                            <i class="bi bi-trash"></i> Confirm Cancellation
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold py-2 shadow-sm" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt sân này không?');">
+                            <i class="bi bi-trash me-1"></i> Xác Nhận Hủy Đặt Sân
                         </button>
-                        <a asp-action="MyBookings" class="btn btn-outline-secondary">Back to My Bookings</a>
+                        <a asp-action="MyBookings" class="btn btn-outline-secondary py-2">Quay lại danh sách đơn</a>
                     </div>
                 </form>
             </div>
@@ -76,4 +78,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

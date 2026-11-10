@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Confirm Booking Hold (UC10)";
+    ViewData["Title"] = "Xác Nhận Đặt Chỗ Sân Bóng";
     var field = (FootballPitchManagement.Models.Entities.FootballField)ViewBag.Field;
     var slot = (FootballPitchManagement.Models.Entities.TimeSlot)ViewBag.Slot;
     var bookingDate = (DateTime)ViewBag.BookingDate;
@@ -10,54 +10,65 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-7">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white py-3">
-                <h4 class="mb-0"><i class="bi bi-calendar-check"></i> Confirm Football Field Booking</h4>
+    <div class="col-lg-7 col-md-9">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white py-3 px-4">
+                <h4 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-shield-check text-warning me-2"></i> Xác Nhận Đặt Lịch Thi Đấu
+                </h4>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
-                    <i class="bi bi-stopwatch-fill fs-3 me-3 text-warning"></i>
+                <!-- Thông báo chính sách giữ chỗ 15 phút -->
+                <div class="alert alert-warning d-flex align-items-center mb-4 rounded-3 border-0 bg-warning bg-opacity-10" role="alert">
+                    <i class="bi bi-stopwatch-fill fs-2 me-3 text-warning"></i>
                     <div>
-                        <strong>15-Minute Slot Hold Policy (POL-02):</strong>
-                        <p class="mb-0 small">
-                            Upon clicking <strong>"Create Booking Hold"</strong>, this slot will be locked exclusively for you for <strong>@holdMinutes minutes</strong>.
-                            You will proceed to make the deposit prepayment of <strong>@depositPercent%</strong> to confirm the reservation.
+                        <strong class="text-dark">Quy định tạm giữ chỗ:</strong>
+                        <p class="mb-0 small text-secondary">
+                            Sau khi nhấn <strong>"Xác Nhận Giữ Chỗ & Đặt Cọc"</strong>, ca thi đấu này sẽ được tạm khóa độc quyền cho bạn trong <strong>@holdMinutes phút</strong> để bạn hoàn tất thanh toán cọc (@depositPercent%).
                         </p>
                     </div>
                 </div>
 
-                <div class="card bg-light border-0 mb-4">
-                    <div class="card-body">
-                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Booking Details Summary</h5>
+                <!-- Tóm tắt thông tin trận đấu -->
+                <div class="card bg-light border-0 rounded-3 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                            <i class="bi bi-info-circle me-1 text-primary"></i> Chi Tiết Đơn Đặt Sân
+                        </h5>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Field:</div>
-                            <div class="col-sm-8 fw-bold">@field.Name (@field.FieldType)</div>
+                            <div class="col-sm-4 text-muted">Sân thi đấu:</div>
+                            <div class="col-sm-8 fw-bold text-dark">@field.Name</div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Location:</div>
+                            <div class="col-sm-4 text-muted">Địa điểm:</div>
                             <div class="col-sm-8">@field.Location</div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Match Date:</div>
-                            <div class="col-sm-8 fw-bold text-primary">@bookingDate.ToString("dddd, dd/MM/yyyy")</div>
+                            <div class="col-sm-4 text-muted">Ngày thi đấu:</div>
+                            <div class="col-sm-8 fw-bold text-primary">
+                                @bookingDate.ToString("dd/MM/yyyy") (@(bookingDate.DayOfWeek == DayOfWeek.Sunday ? "Chủ Nhật" : (bookingDate.DayOfWeek == DayOfWeek.Saturday ? "Thứ Bảy" : "Thứ " + ((int)bookingDate.DayOfWeek + 1))))
+                            </div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Time Slot:</div>
-                            <div class="col-sm-8 fw-bold">@slot.SlotName (@slot.StartTime.ToString(@"hh\:mm") - @slot.EndTime.ToString(@"hh\:mm"))</div>
+                            <div class="col-sm-4 text-muted">Khung giờ đá:</div>
+                            <div class="col-sm-8 fw-bold text-dark">
+                                @slot.SlotName (@slot.StartTime.ToString(@"hh\:mm") - @slot.EndTime.ToString(@"hh\:mm"))
+                            </div>
                         </div>
                         <hr />
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Total Agreed Price:</div>
-                            <div class="col-sm-8 fs-5 fw-bold text-dark">@price.ToString("N0") VND</div>
+                            <div class="col-sm-4 text-muted">Tổng tiền sân:</div>
+                            <div class="col-sm-8 fs-5 fw-bold text-dark">@price.ToString("N0") đ</div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-sm-4 text-muted">Deposit Required (@depositPercent%):</div>
-                            <div class="col-sm-8 fs-5 fw-bold text-success">@requiredPrepayment.ToString("N0") VND</div>
+                            <div class="col-sm-4 text-muted">Tiền cọc cần thanh toán (@depositPercent%):</div>
+                            <div class="col-sm-8 fs-4 fw-bold text-success">@requiredPrepayment.ToString("N0") đ</div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-4 text-muted">Remaining Balance:</div>
-                            <div class="col-sm-8 text-secondary">@((price - requiredPrepayment).ToString("N0")) VND (pay upon arrival or check-out)</div>
+                            <div class="col-sm-4 text-muted">Số tiền thanh toán tại sân:</div>
+                            <div class="col-sm-8 text-secondary">
+                                @((price - requiredPrepayment).ToString("N0")) đ (Thanh toán tại quầy khi trả sân)
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,11 +79,11 @@
                     <input type="hidden" name="bookingDate" value="@bookingDate.ToString("yyyy-MM-dd")" />
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg fw-semibold py-3 shadow-sm">
-                            <i class="bi bi-lock-fill"></i> Create Booking Hold & Proceed to Payment
+                        <button type="submit" class="btn btn-success btn-lg fw-bold py-3 shadow-sm">
+                            <i class="bi bi-lock-fill me-1"></i> Xác Nhận Giữ Chỗ & Đặt Cọc
                         </button>
-                        <a asp-controller="Field" asp-action="Details" asp-route-id="@field.FieldId" asp-route-date="@bookingDate.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary">
-                            Cancel
+                        <a asp-controller="Field" asp-action="Details" asp-route-id="@field.FieldId" asp-route-date="@bookingDate.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary py-2">
+                            Quay lại chọn giờ khác
                         </a>
                     </div>
                 </form>

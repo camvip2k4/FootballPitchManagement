@@ -39,13 +39,13 @@ namespace FootballPitchManagement.Controllers
             var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Username == model.Username.Trim());
             if (account == null || !BCrypt.Net.BCrypt.Verify(model.Password, account.PasswordHash))
             {
-                ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                ModelState.AddModelError(string.Empty, "Tên đăng nhập hoặc mật khẩu không chính xác.");
                 return View(model);
             }
 
             if (account.Status != AccountStatus.ACTIVE)
             {
-                ModelState.AddModelError(string.Empty, "Your account is deactivated. Please contact administrator.");
+                ModelState.AddModelError(string.Empty, "Tài khoản của bạn đang bị tạm khóa. Vui lòng liên hệ quản trị viên.");
                 return View(model);
             }
 
@@ -56,10 +56,19 @@ namespace FootballPitchManagement.Controllers
                 return Redirect(model.ReturnUrl);
             }
 
+            if (account.Role == RoleType.STAFF)
+            {
+                return RedirectToAction("Index", "Staff");
+            }
+            if (account.Role == RoleType.MANAGER || account.Role == RoleType.ADMIN)
+            {
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            }
+
             return RedirectToAction("Index", "Home");
         }
 
-        // Quick demo login helper for convenience
+        // Đăng nhập nhanh tài khoản mẫu
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DemoLogin(string role)
@@ -76,7 +85,7 @@ namespace FootballPitchManagement.Controllers
             if (account != null)
             {
                 await SignInUserAsync(account);
-                TempData["SuccessMessage"] = $"Logged in as demo user: {account.FullName} ({account.Role})";
+                TempData["SuccessMessage"] = $"Đăng nhập thành công với vai trò: {account.FullName} ({account.Role})";
 
                 if (account.Role == RoleType.STAFF)
                 {
@@ -109,13 +118,13 @@ namespace FootballPitchManagement.Controllers
 
             if (await _context.Accounts.AnyAsync(a => a.Username == model.Username.Trim()))
             {
-                ModelState.AddModelError("Username", "Username is already taken.");
+                ModelState.AddModelError("Username", "Tên đăng nhập này đã được sử dụng.");
                 return View(model);
             }
 
             if (await _context.Accounts.AnyAsync(a => a.Email == model.Email.Trim()))
             {
-                ModelState.AddModelError("Email", "Email is already registered.");
+                ModelState.AddModelError("Email", "Địa chỉ email này đã được đăng ký.");
                 return View(model);
             }
 
@@ -135,7 +144,7 @@ namespace FootballPitchManagement.Controllers
             await _context.SaveChangesAsync();
 
             await SignInUserAsync(account);
-            TempData["SuccessMessage"] = "Registration successful! Welcome to Football Field Management System.";
+            TempData["SuccessMessage"] = "Đăng ký tài khoản thành công! Chào mừng bạn đến với Sport Arena.";
 
             return RedirectToAction("Index", "Home");
         }
@@ -146,6 +155,7 @@ namespace FootballPitchManagement.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData["SuccessMessage"] = "Đã đăng xuất khỏi hệ thống.";
             return RedirectToAction("Index", "Home");
         }
 
@@ -173,4 +183,3 @@ namespace FootballPitchManagement.Controllers
         }
     }
 }
-

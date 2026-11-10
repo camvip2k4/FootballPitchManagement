@@ -1,79 +1,83 @@
 @model FootballPitchManagement.Models.ViewModels.LoginVM
 
 @{
-    ViewData["Title"] = "Sign In";
+    ViewData["Title"] = "Đăng Nhập Tài Khoản";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white text-center py-3">
-                <h4 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Sign In to FFMS</h4>
+    <div class="col-lg-5 col-md-7">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white text-center py-4">
+                <i class="bi bi-dribbble text-warning display-4"></i>
+                <h4 class="mb-0 fw-bold mt-2">Đăng Nhập SPORT ARENA</h4>
+                <small class="text-muted">Hệ thống quản lý & đặt sân bóng đá</small>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form asp-action="Login" method="post">
                     <input type="hidden" asp-for="ReturnUrl" />
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="mb-3">
-                        <label asp-for="Username" class="form-label">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input asp-for="Username" class="form-control" placeholder="Enter username" />
+                        <label asp-for="Username" class="form-label fw-bold">Tên đăng nhập</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light"><i class="bi bi-person text-primary"></i></span>
+                            <input asp-for="Username" class="form-control" placeholder="Nhập tên đăng nhập..." />
                         </div>
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-key"></i></span>
-                            <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label fw-bold">Mật khẩu</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light"><i class="bi bi-key text-primary"></i></span>
+                            <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu..." />
                         </div>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
-                    <div class="d-grid gap-2 mb-3">
-                        <button type="submit" class="btn btn-primary py-2 fw-semibold">Login</button>
+                    <div class="d-grid gap-2 mb-4">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold py-3 shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
+                        </button>
                     </div>
 
-                    <div class="text-center">
-                        Don't have an account? <a asp-action="Register">Register here</a>
+                    <div class="text-center text-secondary small">
+                        Chưa có tài khoản? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Đăng ký thành viên mới</a>
                     </div>
                 </form>
 
                 <hr class="my-4" />
 
-                <!-- 1-Click Demo Login Panel -->
+                <!-- Đăng nhập nhanh cho các vai trò -->
                 <div class="text-center">
-                    <p class="text-muted small fw-bold mb-2">⚡ QUICK DEMO LOGIN (TEST ACCOUNTS):</p>
+                    <p class="text-muted small fw-bold mb-2">ĐĂNG NHẬP NHANH THEO VAI TRÒ HỆ THỐNG:</p>
                     <div class="d-flex flex-wrap gap-2 justify-content-center">
                         <form asp-action="DemoLogin" method="post" class="d-inline">
                             <input type="hidden" name="role" value="CUSTOMER" />
-                            <button type="submit" class="btn btn-outline-success btn-sm">
-                                <i class="bi bi-person"></i> Customer
+                            <button type="submit" class="btn btn-outline-success btn-sm px-2 py-1">
+                                <i class="bi bi-person"></i> Khách Hàng
                             </button>
                         </form>
                         <form asp-action="DemoLogin" method="post" class="d-inline">
                             <input type="hidden" name="role" value="STAFF" />
-                            <button type="submit" class="btn btn-outline-warning btn-sm text-dark">
-                                <i class="bi bi-badge-ad"></i> Staff (Front Desk)
+                            <button type="submit" class="btn btn-outline-warning btn-sm px-2 py-1 text-dark">
+                                <i class="bi bi-person-badge"></i> Lễ Tân
                             </button>
                         </form>
                         <form asp-action="DemoLogin" method="post" class="d-inline">
                             <input type="hidden" name="role" value="MANAGER" />
-                            <button type="submit" class="btn btn-outline-info btn-sm text-dark">
-                                <i class="bi bi-briefcase"></i> Manager
+                            <button type="submit" class="btn btn-outline-info btn-sm px-2 py-1 text-dark">
+                                <i class="bi bi-briefcase"></i> Quản Lý
                             </button>
                         </form>
                         <form asp-action="DemoLogin" method="post" class="d-inline">
                             <input type="hidden" name="role" value="ADMIN" />
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
                                 <i class="bi bi-shield-lock"></i> Admin
                             </button>
                         </form>
                     </div>
-                    <small class="text-muted d-block mt-2">(Default password for all accounts: <code>123456</code>)</small>
+                    <small class="text-muted d-block mt-2">(Mật khẩu mặc định: <code>123456</code>)</small>
                 </div>
             </div>
         </div>
@@ -83,4 +87,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

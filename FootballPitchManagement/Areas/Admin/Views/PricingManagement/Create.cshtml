@@ -1,66 +1,68 @@
 @model FootballPitchManagement.Models.Entities.PricingRule
 
 @{
-    ViewData["Title"] = "Add Pricing Rule (UC26)";
+    ViewData["Title"] = "Thêm Quy Tắc Giá";
 }
 
 <div class="row justify-content-center">
     <div class="col-md-7">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-success text-white py-3">
-                <h4 class="mb-0"><i class="bi bi-tag-fill"></i> Add Pricing Rule (UC26)</h4>
+                <h4 class="mb-0"><i class="bi bi-tag-fill me-1"></i> Thiết Lập Quy Tắc Giá Mới</h4>
             </div>
             <div class="card-body p-4">
                 <form asp-action="Create" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="mb-3">
-                        <label asp-for="FieldId" class="form-label fw-bold">Target Football Field</label>
+                        <label asp-for="FieldId" class="form-label fw-bold">Chọn Sân Bóng Áp Dụng</label>
                         <select asp-for="FieldId" asp-items="ViewBag.Fields" class="form-select"></select>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Price" class="form-label fw-bold">Hourly Rate / Slot Price (VND)</label>
-                        <input asp-for="Price" class="form-control form-control-lg fw-bold text-success" />
+                        <label asp-for="Price" class="form-label fw-bold">Mức Giá Thuê Mỗi Khung Giờ (VNĐ)</label>
+                        <input asp-for="Price" class="form-control form-control-lg fw-bold text-success" placeholder="Ví dụ: 250000" />
                         <span asp-validation-for="Price" class="text-danger"></span>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="DayType" class="form-label fw-bold">Day Type</label>
+                            <label asp-for="DayType" class="form-label fw-bold">Phân loại ngày</label>
                             <select asp-for="DayType" class="form-select">
-                                <option value="WEEKDAY">WEEKDAY (Monday to Friday)</option>
-                                <option value="WEEKEND">WEEKEND (Saturday & Sunday)</option>
-                                <option value="HOLIDAY">HOLIDAY</option>
+                                <option value="WEEKDAY">Ngày thường (Thứ 2 đến Thứ 6)</option>
+                                <option value="WEEKEND">Cuối tuần (Thứ 7 & Chủ Nhật)</option>
+                                <option value="HOLIDAY">Ngày lễ tết</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="TimeTier" class="form-label fw-bold">Time Tier</label>
+                            <label asp-for="TimeTier" class="form-label fw-bold">Khung giờ áp dụng</label>
                             <select asp-for="TimeTier" class="form-select">
-                                <option value="NORMAL">NORMAL (Daytime & Morning)</option>
-                                <option value="PEAK">PEAK (Evening >= 17:00 / 5 PM)</option>
+                                <option value="NORMAL">Giờ tiêu chuẩn (Ban ngày & sáng sớm)</option>
+                                <option value="PEAK">Khung giờ vàng (Buổi tối từ 17:00 trở đi)</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label asp-for="Priority" class="form-label fw-bold">Priority (Higher wins)</label>
+                            <label asp-for="Priority" class="form-label fw-bold">Độ ưu tiên (Số lớn hơn thắng)</label>
                             <input asp-for="Priority" class="form-control" type="number" min="1" max="100" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label asp-for="EffectiveFrom" class="form-label fw-bold">Effective From</label>
+                            <label asp-for="EffectiveFrom" class="form-label fw-bold">Hiệu lực từ ngày</label>
                             <input asp-for="EffectiveFrom" class="form-control" type="date" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label asp-for="EffectiveTo" class="form-label fw-bold">Effective To</label>
+                            <label asp-for="EffectiveTo" class="form-label fw-bold">Hiệu lực đến ngày</label>
                             <input asp-for="EffectiveTo" class="form-control" type="date" />
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-success btn-lg fw-semibold py-2">Save Pricing Rule</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success btn-lg fw-semibold py-2">
+                            <i class="bi bi-save me-1"></i> Lưu Quy Tắc Giá
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Hủy bỏ</a>
                     </div>
                 </form>
             </div>
@@ -71,4 +73,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

@@ -50,12 +50,12 @@ namespace FootballPitchManagement.Services
 
             if (refund == null)
             {
-                return (false, "Refund request not found.");
+                return (false, "Không tìm thấy yêu cầu hoàn tiền.");
             }
 
             if (refund.Status != RefundStatus.PENDING)
             {
-                return (false, "This refund request has already been processed.");
+                return (false, "Yêu cầu hoàn tiền này đã được xử lý trước đó.");
             }
 
             refund.Status = isSuccess ? RefundStatus.SUCCESS : RefundStatus.FAILED;
@@ -68,17 +68,16 @@ namespace FootballPitchManagement.Services
             if (refund.Booking?.AccountId.HasValue == true)
             {
                 var notifMsg = isSuccess
-                    ? $"Your refund request {refund.RefundCode} of {refund.Amount:N0} VND has been processed successfully. Proof: {evidenceProof}."
-                    : $"Your refund request {refund.RefundCode} failed during transfer. Reason/Proof: {evidenceProof}. Please contact reception.";
+                    ? $"Yêu cầu hoàn tiền {refund.RefundCode} số tiền {refund.Amount:N0} đ đã được chuyển khoản thành công. Mã giao dịch đối soát: {evidenceProof}."
+                    : $"Yêu cầu hoàn tiền {refund.RefundCode} gặp sự cố khi chuyển khoản. Ghi chú: {evidenceProof}. Vui lòng liên hệ ban quản lý.";
 
                 await _notificationService.SendNotificationAsync(
                     refund.Booking.AccountId.Value,
-                    "REFUND_PROCESSED",
+                    "KẾT_QUẢ_HOÀN_TIỀN",
                     notifMsg);
             }
 
-            return (true, isSuccess ? "Refund processed successfully." : "Refund recorded as failed.");
+            return (true, isSuccess ? "Đã xác nhận hoàn tiền thành công." : "Đã ghi nhận hoàn tiền thất bại.");
         }
     }
 }
-

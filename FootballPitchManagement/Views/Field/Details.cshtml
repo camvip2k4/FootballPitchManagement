@@ -1,85 +1,100 @@
 @model FootballPitchManagement.Models.ViewModels.FieldCardVM
 
 @{
-    ViewData["Title"] = Model.Name + " - Details & Time Slots";
+    ViewData["Title"] = Model.Name + " - Chi Tiết & Bảng Ca Đá";
     var searchDate = (DateTime)ViewBag.SearchDate;
 }
 
 <div class="mb-4">
     <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">
-        <i class="bi bi-arrow-left"></i> Back to Field Search
+        <i class="bi bi-arrow-left"></i> Quay lại danh sách sân
     </a>
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <h2 class="fw-bold text-primary mb-1">@Model.Name</h2>
-                    <span class="badge bg-secondary fs-6 me-2">@Model.FieldType</span>
-                    <span class="badge @(Model.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "bg-success" : "bg-danger") fs-6">
-                        @Model.Status
+                    <h2 class="fw-bold text-dark mb-1">@Model.Name</h2>
+                    <span class="badge bg-primary fs-6 me-2">
+                        @(Model.FieldType == FootballPitchManagement.Models.Enums.FieldType.FIELD_5 ? "Sân 5 người" : (Model.FieldType == FootballPitchManagement.Models.Enums.FieldType.FIELD_7 ? "Sân 7 người" : "Sân 11 người"))
                     </span>
-                    <p class="text-muted mt-2 mb-0"><i class="bi bi-geo-alt-fill text-danger"></i> @Model.Location</p>
+                    <span class="badge @(Model.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "bg-success" : "bg-danger") fs-6">
+                        @(Model.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "Sẵn sàng đón khách" : "Đang bảo trì")
+                    </span>
+                    <p class="text-muted mt-2 mb-0"><i class="bi bi-geo-alt-fill text-danger me-1"></i> @Model.Location</p>
                 </div>
             </div>
             <hr />
-            <p class="lead text-secondary">@Model.Description</p>
+            <p class="lead text-secondary fs-6 mb-0">@Model.Description</p>
         </div>
     </div>
 </div>
 
-<!-- Date Selector -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-body p-3">
+<!-- Chọn ngày xem lịch -->
+<div class="card shadow-sm border-0 mb-4 rounded-4">
+    <div class="card-body p-3 bg-white rounded-4">
         <form method="get" asp-action="Details" asp-route-id="@Model.FieldId" class="row g-3 align-items-center">
             <input type="hidden" name="id" value="@Model.FieldId" />
             <div class="col-auto">
-                <label class="col-form-label fw-bold">Select Date:</label>
+                <label class="col-form-label fw-bold"><i class="bi bi-calendar-event text-primary me-1"></i> Chọn ngày xem ca trống:</label>
             </div>
             <div class="col-auto">
                 <input type="date" name="date" class="form-control" value="@searchDate.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="this.form.submit()" />
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-primary">Check Availability</button>
+                <button type="submit" class="btn btn-outline-primary">Xem Lịch</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Slots Grid -->
-<div class="card shadow-sm border-0">
-    <div class="card-header bg-white py-3">
-        <h5 class="fw-bold mb-0">Time Slots for @searchDate.ToString("dddd, dd/MM/yyyy")</h5>
+<!-- Lưới các ca đá -->
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header bg-white py-3 px-4 rounded-top-4 border-0">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-clock-history text-success me-1"></i> Các ca thi đấu ngày @searchDate.ToString("dd/MM/yyyy")
+        </h5>
     </div>
-    <div class="card-body">
+    <div class="card-body px-4 pt-0 pb-4">
         <div class="row g-3">
             @foreach (var slot in Model.Slots)
             {
                 <div class="col-md-4">
-                    <div class="border rounded p-3 @(slot.IsAvailable ? "border-success bg-white" : "border-light bg-light") h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div class="border rounded-4 p-3 @(slot.IsAvailable ? "border-success bg-white shadow-sm" : "border-light bg-light") h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-bold">@slot.SlotName</span>
-                                <span class="badge @slot.BadgeClass">@slot.StatusDisplay</span>
+                                <span class="fw-bold text-dark">@slot.SlotName</span>
+                                @{
+                                    string vnStatus = slot.StatusDisplay switch
+                                    {
+                                        "Available" => "Còn trống",
+                                        "Hold (15m)" => "Đang giữ chỗ",
+                                        "In Use" => "Đang thi đấu",
+                                        "Booked" => "Đã có người đặt",
+                                        "Maintenance" => "Bảo trì",
+                                        _ => slot.StatusDisplay
+                                    };
+                                }
+                                <span class="badge @slot.BadgeClass">@vnStatus</span>
                             </div>
                             <p class="text-muted small mb-2">
-                                <i class="bi bi-clock"></i> @slot.StartTime.ToString(@"hh\:mm") - @slot.EndTime.ToString(@"hh\:mm")
+                                <i class="bi bi-clock me-1 text-primary"></i> @slot.StartTime.ToString(@"hh\:mm") - @slot.EndTime.ToString(@"hh\:mm")
                             </p>
-                            <h5 class="text-success fw-bold">@slot.Price.ToString("N0") VND</h5>
+                            <h4 class="text-success fw-bold">@slot.Price.ToString("N0") <span class="small fw-normal">đ</span></h4>
                         </div>
-                        <div class="mt-3">
+                        <div class="mt-3 pt-2 border-top">
                             @if (slot.IsAvailable)
                             {
                                 <a asp-controller="Booking" asp-action="Create"
                                    asp-route-fieldId="@Model.FieldId"
                                    asp-route-slotId="@slot.SlotId"
                                    asp-route-date="@searchDate.ToString("yyyy-MM-dd")"
-                                   class="btn btn-success w-100 fw-semibold">
-                                    <i class="bi bi-calendar-plus"></i> Book Slot
+                                   class="btn btn-success w-100 fw-bold py-2 shadow-sm">
+                                    <i class="bi bi-calendar-plus me-1"></i> Đặt Ca Này
                                 </a>
                             }
                             else
                             {
-                                <button class="btn btn-secondary w-100" disabled>Unavailable</button>
+                                <button class="btn btn-secondary w-100 py-2" disabled>Không thể đặt</button>
                             }
                         </div>
                     </div>
@@ -88,4 +103,3 @@
         </div>
     </div>
 </div>
-

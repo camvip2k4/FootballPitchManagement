@@ -31,7 +31,7 @@ namespace FootballPitchManagement.Controllers
             _refundService = refundService;
         }
 
-        // GET: /Staff or /Staff/Index (Daily Schedule & Operations Grid)
+        // GET: /Staff (Bàn làm việc điều độ sân tại quầy lễ tân)
         public async Task<IActionResult> Index(DateTime? date)
         {
             var targetDate = (date ?? DateTime.Today).Date;
@@ -47,7 +47,7 @@ namespace FootballPitchManagement.Controllers
             return View(bookings);
         }
 
-        // GET: /Staff/WalkIn (UC37: Counter Booking)
+        // GET: /Staff/WalkIn (Tiếp nhận khách vãng lai / đặt qua điện thoại)
         public async Task<IActionResult> WalkIn()
         {
             var fields = await _context.FootballFields.Where(f => f.IsActive && f.Status != FieldStatus.MAINTENANCE).ToListAsync();
@@ -59,7 +59,7 @@ namespace FootballPitchManagement.Controllers
             return View(new WalkInBookingVM { BookingDate = DateTime.Today });
         }
 
-        // POST: /Staff/WalkIn (UC37)
+        // POST: /Staff/WalkIn
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> WalkIn(WalkInBookingVM model)
@@ -99,7 +99,7 @@ namespace FootballPitchManagement.Controllers
             return View(model);
         }
 
-        // POST: /Staff/CheckIn/5 (UC19)
+        // POST: /Staff/CheckIn/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CheckIn(int id)
@@ -119,7 +119,7 @@ namespace FootballPitchManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Staff/CheckOut/5 (UC20)
+        // GET: /Staff/CheckOut/5
         public async Task<IActionResult> CheckOut(int id)
         {
             var booking = await _bookingService.GetBookingByIdAsync(id);
@@ -132,8 +132,8 @@ namespace FootballPitchManagement.Controllers
             {
                 BookingId = booking.BookingId,
                 BookingCode = booking.BookingCode,
-                FieldName = booking.Field?.Name ?? "Field",
-                CustomerInfo = booking.Account?.FullName ?? booking.GuestName ?? "Walk-in Guest",
+                FieldName = booking.Field?.Name ?? "Sân bóng",
+                CustomerInfo = booking.Account?.FullName ?? booking.GuestName ?? "Khách vãng lai",
                 AgreedPrice = booking.AgreedPrice,
                 PaidAmount = booking.PaidAmount,
                 BalanceDue = booking.BalanceDue,
@@ -145,7 +145,7 @@ namespace FootballPitchManagement.Controllers
             return View(vm);
         }
 
-        // POST: /Staff/CheckOut (UC20)
+        // POST: /Staff/CheckOut
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CheckOut(CheckOutVM model)
@@ -169,7 +169,7 @@ namespace FootballPitchManagement.Controllers
             return View(model);
         }
 
-        // POST: /Staff/NoShow/5 (UC35)
+        // POST: /Staff/NoShow/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NoShow(int id)
@@ -189,7 +189,7 @@ namespace FootballPitchManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Staff/RecordPayment/5 (UC23)
+        // GET: /Staff/RecordPayment/5
         public async Task<IActionResult> RecordPayment(int id)
         {
             var booking = await _bookingService.GetBookingByIdAsync(id);
@@ -210,7 +210,7 @@ namespace FootballPitchManagement.Controllers
             return View(vm);
         }
 
-        // POST: /Staff/RecordPayment (UC23)
+        // POST: /Staff/RecordPayment
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RecordPayment(RecordPaymentVM model)
@@ -225,7 +225,7 @@ namespace FootballPitchManagement.Controllers
                 model.BookingId,
                 model.Amount,
                 model.Method,
-                model.ReceiptRef ?? "Counter receipt",
+                model.ReceiptRef ?? "Phiếu thu tiền mặt tại quầy",
                 staffId);
 
             if (result.Success)
@@ -238,14 +238,14 @@ namespace FootballPitchManagement.Controllers
             return View(model);
         }
 
-        // GET: /Staff/RefundQueue (UC34)
+        // GET: /Staff/RefundQueue
         public async Task<IActionResult> RefundQueue()
         {
             var refunds = await _refundService.GetAllRefundRequestsAsync();
             return View(refunds);
         }
 
-        // GET: /Staff/ProcessRefund/5 (UC34)
+        // GET: /Staff/ProcessRefund/5
         public async Task<IActionResult> ProcessRefund(int id)
         {
             var refund = await _context.RefundRequests
@@ -264,14 +264,14 @@ namespace FootballPitchManagement.Controllers
                 Amount = refund.Amount,
                 Reason = refund.Reason,
                 RefundType = refund.RefundType,
-                EvidenceProof = "Bank transfer ref / Cash slip",
+                EvidenceProof = "Ủy nhiệm chi / Mã giao dịch ngân hàng",
                 IsSuccess = true
             };
 
             return View(vm);
         }
 
-        // POST: /Staff/ProcessRefund (UC34)
+        // POST: /Staff/ProcessRefund
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessRefund(ProcessRefundVM model)
@@ -300,4 +300,3 @@ namespace FootballPitchManagement.Controllers
         }
     }
 }
-

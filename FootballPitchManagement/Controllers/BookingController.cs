@@ -31,7 +31,7 @@ namespace FootballPitchManagement.Controllers
             _context = context;
         }
 
-        // GET: /Booking or /Booking/Index (redirects to MyBookings if logged in, or Search)
+        // GET: /Booking
         public IActionResult Index()
         {
             if (User.Identity?.IsAuthenticated == true)
@@ -41,7 +41,7 @@ namespace FootballPitchManagement.Controllers
             return RedirectToAction("Index", "Field");
         }
 
-        // GET: /Booking/Create?fieldId=1&slotId=2&date=2026-11-10 (UC10)
+        // GET: /Booking/Create?fieldId=1&slotId=2&date=2026-11-10
         [Authorize]
         public async Task<IActionResult> Create(int fieldId, int slotId, DateTime? date)
         {
@@ -51,7 +51,7 @@ namespace FootballPitchManagement.Controllers
 
             if (field == null || slot == null)
             {
-                TempData["ErrorMessage"] = "Invalid field or time slot.";
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin sân bóng hoặc khung giờ thi đấu.";
                 return RedirectToAction("Index", "Field");
             }
 
@@ -64,7 +64,7 @@ namespace FootballPitchManagement.Controllers
 
             if (currentPending >= maxPending)
             {
-                TempData["ErrorMessage"] = $"You already have {currentPending} pending booking holds (max {maxPending}). Please complete or cancel them before booking more.";
+                TempData["ErrorMessage"] = $"Bạn đang có {currentPending} đơn đặt sân chờ thanh toán (tối đa {maxPending} đơn). Vui lòng thanh toán hoặc hủy đơn cũ trước khi đặt thêm.";
                 return RedirectToAction(nameof(MyBookings));
             }
 
@@ -84,7 +84,7 @@ namespace FootballPitchManagement.Controllers
             return View();
         }
 
-        // POST: /Booking/Create (UC10)
+        // POST: /Booking/Create
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -103,7 +103,7 @@ namespace FootballPitchManagement.Controllers
             return RedirectToAction(nameof(Payment), new { id = result.Booking.BookingId });
         }
 
-        // GET: /Booking/Payment/5 (UC14: Make Payment Screen)
+        // GET: /Booking/Payment/5
         [Authorize]
         public async Task<IActionResult> Payment(int id)
         {
@@ -123,8 +123,8 @@ namespace FootballPitchManagement.Controllers
             {
                 BookingId = booking.BookingId,
                 BookingCode = booking.BookingCode,
-                FieldName = booking.Field?.Name ?? "Field",
-                SlotName = booking.TimeSlot?.SlotName ?? "Slot",
+                FieldName = booking.Field?.Name ?? "Sân bóng",
+                SlotName = booking.TimeSlot?.SlotName ?? "Khung giờ",
                 BookingDate = booking.BookingDate,
                 AgreedPrice = booking.AgreedPrice,
                 RequiredPrepayment = booking.RequiredPrepayment,
@@ -141,7 +141,7 @@ namespace FootballPitchManagement.Controllers
             return View(vm);
         }
 
-        // POST: /Booking/Payment (UC14: Make Payment Execution)
+        // POST: /Booking/Payment
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -175,7 +175,7 @@ namespace FootballPitchManagement.Controllers
             return View(bookings);
         }
 
-        // GET: /Booking/Cancel/5 (UC13: Customer Cancellation Dialog)
+        // GET: /Booking/Cancel/5
         [Authorize]
         public async Task<IActionResult> Cancel(int id)
         {
@@ -205,7 +205,7 @@ namespace FootballPitchManagement.Controllers
             return View(vm);
         }
 
-        // POST: /Booking/Cancel (UC13)
+        // POST: /Booking/Cancel
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]

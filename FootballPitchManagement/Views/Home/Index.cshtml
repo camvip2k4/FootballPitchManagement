@@ -1,75 +1,80 @@
 @model IEnumerable<FootballPitchManagement.Models.Entities.FootballField>
 
 @{
-    ViewData["Title"] = "Football Field Management System";
+    ViewData["Title"] = "Trang Chủ - Đặt Sân Bóng Đá Trực Tuyến";
 }
 
 <!-- Hero Section -->
-<div class="hero-banner shadow-sm">
+<div class="hero-banner">
     <div class="row align-items-center">
         <div class="col-lg-8">
-            <h1 class="display-5 fw-bold mb-3">Premium Football Fields Booking</h1>
-            <p class="lead mb-4">
-                Real-time slot availability, instant 15-minute slot holds, transparent pricing and automatic refund management.
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
+                <i class="bi bi-star-fill text-danger me-1"></i> Tổ hợp thể thao hiện đại bậc nhất
+            </span>
+            <h1 class="display-4 fw-bold mb-3 text-white">Đặt Sân Bóng Đá Nhanh Chóng & Tiện Lợi</h1>
+            <p class="lead mb-4 text-light opacity-90">
+                Theo dõi tình trạng sân còn trống theo thời gian thực, tạm giữ chỗ độc quyền 15 phút, thanh toán linh hoạt và chính sách hoàn hủy minh bạch.
             </p>
-            <div class="d-flex flex-wrap gap-2">
-                <a asp-controller="Field" asp-action="Index" class="btn btn-warning btn-lg fw-semibold text-dark shadow-sm">
-                    <i class="bi bi-calendar-check"></i> Book a Field Now
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Field" asp-action="Index" class="btn btn-warning btn-lg fw-bold px-4 py-3 shadow text-dark">
+                    <i class="bi bi-calendar2-check me-2"></i> Đặt Sân Thi Đấu Ngay
                 </a>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <a asp-controller="Booking" asp-action="MyBookings" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-journal-check"></i> My Bookings
+                    <a asp-controller="Booking" asp-action="MyBookings" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="bi bi-receipt me-2"></i> Đơn Đặt Của Tôi
                     </a>
                 }
                 else
                 {
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-box-arrow-in-right"></i> Sign In / Demo Login
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Đăng Nhập / Đăng Ký
                     </a>
                 }
             </div>
         </div>
         <div class="col-lg-4 text-center d-none d-lg-block">
-            <i class="bi bi-trophy text-warning" style="font-size: 8rem;"></i>
+            <i class="bi bi-trophy-fill text-warning opacity-75" style="font-size: 10rem;"></i>
         </div>
     </div>
 </div>
 
-<!-- Quick Search Form -->
-<div class="card shadow-sm border-0 mb-5 mt-n4">
-    <div class="card-body p-4 bg-white rounded">
+<!-- Thanh tìm kiếm nhanh -->
+<div class="card shadow border-0 mb-5 mt-n4" style="margin-top: -30px;">
+    <div class="card-body p-4 bg-white rounded-4">
         <form asp-controller="Field" asp-action="Index" method="get" class="row g-3 align-items-end">
             <div class="col-md-4">
-                <label class="form-label fw-semibold text-muted"><i class="bi bi-calendar3"></i> Choose Date</label>
+                <label class="form-label fw-bold text-dark"><i class="bi bi-calendar-event text-success me-1"></i> Ngày Thi Đấu</label>
                 <input type="date" name="date" class="form-control form-control-lg" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold text-muted"><i class="bi bi-grid-3x3"></i> Field Type</label>
+                <label class="form-label fw-bold text-dark"><i class="bi bi-grid-3x3 text-primary me-1"></i> Cỡ Sân Bóng</label>
                 <select name="fieldType" class="form-select form-select-lg">
-                    <option value="">All Field Sizes</option>
-                    <option value="FIELD_5">5-a-side Mini Pitch</option>
-                    <option value="FIELD_7">7-a-side Medium Pitch</option>
-                    <option value="FIELD_11">11-a-side Full Stadium</option>
+                    <option value="">Tất cả các cỡ sân</option>
+                    <option value="FIELD_5">Sân 5 người (Bóng đá mini)</option>
+                    <option value="FIELD_7">Sân 7 người (Phong trào tiêu chuẩn)</option>
+                    <option value="FIELD_11">Sân 11 người (Sân vận động FIFA)</option>
                 </select>
             </div>
             <div class="col-md-4">
-                <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
-                    <i class="bi bi-search"></i> Search Available Slots
+                <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-3 shadow-sm">
+                    <i class="bi bi-search me-1"></i> Tìm Sân & Khung Giờ Trống
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Featured Fields -->
+<!-- Danh sách sân nổi bật -->
 <div class="mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
-            <h3 class="fw-bold mb-0">Our Pitches</h3>
-            <p class="text-muted mb-0">Well-maintained artificial grass pitches with modern lighting</p>
+            <h3 class="fw-bold mb-1 text-dark">Hệ Thống Sân Thi Đấu SPORT ARENA</h3>
+            <p class="text-muted mb-0">Mặt cỏ cao cấp, hệ thống thoát nước thông minh và đèn chiếu sáng chuẩn thi đấu</p>
         </div>
-        <a asp-controller="Field" asp-action="Index" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+        <a asp-controller="Field" asp-action="Index" class="btn btn-outline-primary fw-semibold">
+            Xem Tất Cả Khung Giờ <i class="bi bi-arrow-right"></i>
+        </a>
     </div>
 
     <div class="row g-4">
@@ -78,24 +83,26 @@
             @foreach (var field in Model)
             {
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body">
+                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                        <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title fw-bold mb-0">@field.Name</h5>
-                                <span class="badge @(field.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "bg-success" : "bg-danger")">
-                                    @field.Status
+                                <h5 class="card-title fw-bold text-dark mb-0">@field.Name</h5>
+                                <span class="badge @(field.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "bg-success" : "bg-danger") px-3 py-2">
+                                    @(field.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "Sẵn sàng đón khách" : "Đang bảo trì")
                                 </span>
                             </div>
-                            <span class="badge bg-secondary mb-3">@field.FieldType</span>
-                            <p class="card-text text-muted small"><i class="bi bi-geo-alt"></i> @field.Location</p>
-                            <p class="card-text">@field.Description</p>
-                            <p class="text-muted small">
-                                <i class="bi bi-clock"></i> Hours: @field.OpenTime.ToString(@"hh\:mm") - @field.CloseTime.ToString(@"hh\:mm")
-                            </p>
+                            <span class="badge bg-primary mb-3">
+                                @(field.FieldType == FootballPitchManagement.Models.Enums.FieldType.FIELD_5 ? "Sân 5 người" : (field.FieldType == FootballPitchManagement.Models.Enums.FieldType.FIELD_7 ? "Sân 7 người" : "Sân 11 người"))
+                            </span>
+                            <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> @field.Location</p>
+                            <p class="card-text text-secondary mb-3 small" style="min-height: 48px;">@field.Description</p>
+                            <div class="bg-light p-2 rounded small text-muted mb-3">
+                                <i class="bi bi-clock-history me-1 text-primary"></i> Khung giờ hoạt động: <strong>@field.OpenTime.ToString(@"hh\:mm") - @field.CloseTime.ToString(@"hh\:mm")</strong>
+                            </div>
                         </div>
-                        <div class="card-footer bg-transparent border-0 pt-0 pb-3">
-                            <a asp-controller="Field" asp-action="Details" asp-route-id="@field.FieldId" class="btn btn-outline-success w-100">
-                                <i class="bi bi-calendar4-range"></i> Check Slots & Pricing
+                        <div class="card-footer bg-white border-0 pt-0 pb-4 px-4">
+                            <a asp-controller="Field" asp-action="Details" asp-route-id="@field.FieldId" class="btn btn-outline-success w-100 fw-bold py-2">
+                                <i class="bi bi-calendar3 me-1"></i> Xem Ca Đá & Bảng Giá
                             </a>
                         </div>
                     </div>
@@ -105,34 +112,42 @@
     </div>
 </div>
 
-<!-- System Features & Policies Highlights -->
+<!-- Lợi ích và cam kết dịch vụ -->
 <div class="row g-4 text-center my-4">
     <div class="col-md-3">
-        <div class="p-4 bg-white rounded shadow-sm h-100">
-            <i class="bi bi-stopwatch text-warning" style="font-size: 2.5rem;"></i>
-            <h5 class="fw-bold mt-3">15-Minute Hold</h5>
-            <p class="text-muted small">When you book, the slot is locked exclusively for 15 minutes while you make prepayment.</p>
+        <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+            <div class="bg-warning bg-opacity-10 text-warning d-inline-flex p-3 rounded-circle mb-3">
+                <i class="bi bi-stopwatch-fill fs-2"></i>
+            </div>
+            <h5 class="fw-bold">Tạm Giữ Chỗ 15 Phút</h5>
+            <p class="text-muted small mb-0">Slot được khóa độc quyền cho bạn trong 15 phút để thong thả hoàn tất chuyển khoản đặt cọc.</p>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="p-4 bg-white rounded shadow-sm h-100">
-            <i class="bi bi-pie-chart text-primary" style="font-size: 2.5rem;"></i>
-            <h5 class="fw-bold mt-3">Dynamic Pricing</h5>
-            <p class="text-muted small">Automatic rate calculation based on day type (weekday/weekend) and peak hour tiers.</p>
+        <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+            <div class="bg-success bg-opacity-10 text-success d-inline-flex p-3 rounded-circle mb-3">
+                <i class="bi bi-qr-code fs-2"></i>
+            </div>
+            <h5 class="fw-bold">Thanh Toán VietQR & Ví</h5>
+            <p class="text-muted small mb-0">Quét mã QR chuyển khoản ngân hàng 24/7, tự động kiểm tra và xác nhận đơn ngay tức khắc.</p>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="p-4 bg-white rounded shadow-sm h-100">
-            <i class="bi bi-shield-check text-success" style="font-size: 2.5rem;"></i>
-            <h5 class="fw-bold mt-3">Fair Cancellation</h5>
-            <p class="text-muted small">Cancel anytime up to 24 hours before kick-off to receive automated refund processing.</p>
+        <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+            <div class="bg-primary bg-opacity-10 text-primary d-inline-flex p-3 rounded-circle mb-3">
+                <i class="bi bi-shield-check fs-2"></i>
+            </div>
+            <h5 class="fw-bold">Hủy Sân Linh Hoạt</h5>
+            <p class="text-muted small mb-0">Khách được hủy sân trước giờ đá tối thiểu 24 tiếng và nhận lại 100% tiền đặt cọc tự động.</p>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="p-4 bg-white rounded shadow-sm h-100">
-            <i class="bi bi-currency-exchange text-info" style="font-size: 2.5rem;"></i>
-            <h5 class="fw-bold mt-3">100% Weather Refund</h5>
-            <p class="text-muted small">In case of extreme weather or pitch maintenance, the facility refunds 100% of your money.</p>
+        <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+            <div class="bg-info bg-opacity-10 text-info d-inline-flex p-3 rounded-circle mb-3">
+                <i class="bi bi-cloud-sun-fill fs-2"></i>
+            </div>
+            <h5 class="fw-bold">Hoàn Tiền Thời Tiết Xấu</h5>
+            <p class="text-muted small mb-0">Trong trường hợp mưa bão hoặc sự cố kỹ thuật từ phía sân, hoàn trả 100% tiền cọc cho khách.</p>
         </div>
     </div>
 </div>

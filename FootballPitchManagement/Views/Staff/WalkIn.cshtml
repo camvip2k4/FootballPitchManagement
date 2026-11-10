@@ -1,14 +1,16 @@
 @model FootballPitchManagement.Models.ViewModels.WalkInBookingVM
 
 @{
-    ViewData["Title"] = "Create Walk-in Booking (UC37)";
+    ViewData["Title"] = "Đặt Sân Khách Vãng Lai Tại Quầy";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-7">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-success text-white py-3">
-                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Front Desk Walk-In Booking (UC37)</h4>
+    <div class="col-lg-7 col-md-9">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white py-3 px-4">
+                <h4 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-person-plus-fill me-2"></i> Tiếp Nhận Đặt Sân Tại Quầy & Điện Thoại
+                </h4>
             </div>
             <div class="card-body p-4">
                 <form asp-action="WalkIn" method="post">
@@ -16,68 +18,68 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="FieldId" class="form-label fw-bold">Select Pitch</label>
-                            <select asp-for="FieldId" asp-items="ViewBag.Fields" class="form-select">
-                                <option value="">-- Choose Football Field --</option>
+                            <label asp-for="FieldId" class="form-label fw-bold">Chọn Sân Thi Đấu</label>
+                            <select asp-for="FieldId" asp-items="ViewBag.Fields" class="form-select form-select-lg">
+                                <option value="">-- Chọn Sân Bóng --</option>
                             </select>
                             <span asp-validation-for="FieldId" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="SlotId" class="form-label fw-bold">Time Slot</label>
-                            <select asp-for="SlotId" asp-items="ViewBag.Slots" class="form-select">
-                                <option value="">-- Choose Time Slot --</option>
+                            <label asp-for="SlotId" class="form-label fw-bold">Chọn Khung Giờ (Ca Đá)</label>
+                            <select asp-for="SlotId" asp-items="ViewBag.Slots" class="form-select form-select-lg">
+                                <option value="">-- Chọn Khung Giờ --</option>
                             </select>
                             <span asp-validation-for="SlotId" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="BookingDate" class="form-label fw-bold">Booking Date</label>
+                        <label asp-for="BookingDate" class="form-label fw-bold">Ngày Thi Đấu</label>
                         <input asp-for="BookingDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                         <span asp-validation-for="BookingDate" class="text-danger"></span>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="GuestName" class="form-label fw-bold">Customer / Guest Name</label>
-                            <input asp-for="GuestName" class="form-control" placeholder="Nguyen Van B" />
+                            <label asp-for="GuestName" class="form-label fw-bold">Tên Khách Hàng / Đội Bóng</label>
+                            <input asp-for="GuestName" class="form-control" placeholder="Ví dụ: FC Anh Em, Anh Tuấn..." />
                             <span asp-validation-for="GuestName" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="GuestPhone" class="form-label fw-bold">Customer Phone Number</label>
+                            <label asp-for="GuestPhone" class="form-label fw-bold">Số Điện Thoại Liên Hệ</label>
                             <input asp-for="GuestPhone" class="form-control" placeholder="0987112233" />
                             <span asp-validation-for="GuestPhone" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <hr />
-                    <h5 class="fw-bold text-primary mb-3">Immediate Direct Payment (Optional):</h5>
+                    <hr class="my-4" />
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-cash-stack text-success me-1"></i> Thu Tiền Trực Tiếp Tại Quầy:</h5>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="DirectPaymentAmount" class="form-label fw-bold">Collected Amount (VND)</label>
-                            <input asp-for="DirectPaymentAmount" class="form-control" placeholder="e.g. 150000 or full price" />
-                            <small class="text-muted">If payment >= deposit, booking is immediately Confirmed.</small>
+                            <label asp-for="DirectPaymentAmount" class="form-label fw-bold">Số Tiền Thu Ngay (VND)</label>
+                            <input asp-for="DirectPaymentAmount" class="form-control fw-bold text-success" placeholder="Nhập số tiền thu cọc hoặc thu đủ" />
+                            <small class="text-muted">Nếu thu >= tiền cọc (30%), đơn sẽ tự động chuyển sang ĐÃ XÁC NHẬN.</small>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="PaymentMethod" class="form-label fw-bold">Payment Method</label>
+                            <label asp-for="PaymentMethod" class="form-label fw-bold">Hình Thức Thu Tiền</label>
                             <select asp-for="PaymentMethod" class="form-select">
-                                <option value="CASH">Cash at Counter</option>
-                                <option value="BANK_TRANSFER">Bank Transfer (QR)</option>
+                                <option value="CASH">Tiền mặt tại quầy</option>
+                                <option value="BANK_TRANSFER">Chuyển khoản VietQR</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="ReceiptRef" class="form-label">Receipt / Transfer Reference</label>
-                        <input asp-for="ReceiptRef" class="form-control" placeholder="Optional receipt or bill code" />
+                        <label asp-for="ReceiptRef" class="form-label">Ghi Chú Phiếu Thu / Mã Hóa Đơn</label>
+                        <input asp-for="ReceiptRef" class="form-control" placeholder="Mã phiếu thu hoặc ghi chú của lễ tân" />
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg fw-semibold py-3">
-                            <i class="bi bi-check-circle"></i> Create Counter Booking
+                        <button type="submit" class="btn btn-success btn-lg fw-bold py-3 shadow-sm">
+                            <i class="bi bi-check-circle me-1"></i> Tạo Đơn Đặt Sân Tại Quầy
                         </button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-2">Quay lại bàn điều độ</a>
                     </div>
                 </form>
             </div>
@@ -88,4 +90,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

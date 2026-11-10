@@ -1,22 +1,22 @@
 @model IEnumerable<FootballPitchManagement.Models.Entities.Booking>
 
 @{
-    ViewData["Title"] = "Facility Emergency Cancellation (UC39)";
+    ViewData["Title"] = "Hủy Đặt Sân Do Sự Cố Cơ Sở Vật Chất";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold mb-1"><i class="bi bi-shield-slash text-danger"></i> Facility Cancellation (UC39)</h2>
-        <p class="text-muted mb-0">Cancel bookings due to facility maintenance, weather, or emergencies. 100% automatic refund will be issued.</p>
+        <h2 class="fw-bold mb-1"><i class="bi bi-shield-slash text-danger"></i> Hủy Sân Do Sự Cố Cơ Sở Vật Chất</h2>
+        <p class="text-muted mb-0">Hủy đơn đặt sân chủ động do trung tâm cần sửa chữa khẩn cấp, ngập úng hoặc bão lũ. Hệ thống sẽ tự động hoàn 100% tiền cọc cho khách hàng.</p>
     </div>
 </div>
 
 <div class="alert alert-danger d-flex align-items-center mb-4">
     <i class="bi bi-exclamation-octagon-fill fs-3 me-3"></i>
     <div>
-        <strong>Manager Facility Cancellation Policy:</strong>
+        <strong>Chính sách bồi hoàn do trung tâm hủy:</strong>
         <p class="mb-0 small">
-            Facility cancellation bypasses customer cutoff rules and automatically queues a <strong>100% refund</strong> for all paid amounts. An in-app notification is sent to the customer immediately.
+            Khi Quản lý thực hiện hủy sân do sự cố, hệ thống sẽ bỏ qua quy tắc thời gian cắt hủy của khách hàng và tự động tạo yêu cầu hoàn trả <strong>100% số tiền khách đã thanh toán</strong>, đồng thời gửi thông báo khẩn tới tài khoản khách hàng.
         </p>
     </div>
 </div>
@@ -25,13 +25,13 @@
     <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
             <tr>
-                <th>Booking Code</th>
-                <th>Pitch</th>
-                <th>Slot / Date</th>
-                <th>Customer</th>
-                <th>Paid Amount</th>
-                <th>Status</th>
-                <th style="min-width: 320px;">Facility Cancellation Reason & Action</th>
+                <th>Mã đặt sân</th>
+                <th>Sân bóng</th>
+                <th>Khung giờ / Ngày đấu</th>
+                <th>Khách hàng</th>
+                <th>Đã thanh toán</th>
+                <th>Trạng thái</th>
+                <th style="min-width: 320px;">Lý do hủy sân & Xác nhận</th>
             </tr>
         </thead>
         <tbody>
@@ -47,21 +47,21 @@
                             <small class="text-muted">@b.TimeSlot?.SlotName</small>
                         </td>
                         <td>
-                            <div>@(b.Account?.FullName ?? b.GuestName ?? "Guest")</div>
+                            <div>@(b.Account?.FullName ?? b.GuestName ?? "Khách vãng lai")</div>
                             <small class="text-muted">@(b.Account?.Phone ?? b.GuestPhone)</small>
                         </td>
-                        <td class="text-success fw-bold">@b.PaidAmount.ToString("N0") VND</td>
+                        <td class="text-success fw-bold">@b.PaidAmount.ToString("N0") VNĐ</td>
                         <td>
                             <span class="badge @(b.Status == FootballPitchManagement.Models.Enums.BookingStatus.CONFIRMED ? "bg-success" : "bg-warning text-dark")">
-                                @b.Status
+                                @(b.Status == FootballPitchManagement.Models.Enums.BookingStatus.CONFIRMED ? "Đã xác nhận" : "Chờ thanh toán")
                             </span>
                         </td>
                         <td>
-                            <form asp-action="Cancel" method="post" class="d-flex gap-2" onsubmit="return confirm('Are you sure you want to cancel this booking for facility reasons? 100% refund will be queued.');">
+                            <form asp-action="Cancel" method="post" class="d-flex gap-2" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt sân này do sự cố trung tâm? Hệ thống sẽ tạo yêu cầu hoàn trả 100% tiền.');">
                                 <input type="hidden" name="bookingId" value="@b.BookingId" />
-                                <input type="text" name="reason" class="form-control form-control-sm" placeholder="e.g. Heavy storm, lightning, flood, broken turf..." required />
+                                <input type="text" name="reason" class="form-control form-control-sm" placeholder="Nhập lý do: Mưa bão ngập sân, hỏng giàn đèn..." required />
                                 <button type="submit" class="btn btn-danger btn-sm text-nowrap">
-                                    <i class="bi bi-x-circle"></i> Cancel
+                                    <i class="bi bi-x-circle me-1"></i> Hủy Sân
                                 </button>
                             </form>
                         </td>
@@ -71,10 +71,9 @@
             else
             {
                 <tr>
-                    <td colspan="7" class="text-center py-4 text-muted">No active bookings eligible for facility cancellation.</td>
+                    <td colspan="7" class="text-center py-4 text-muted">Không có đơn đặt sân nào cần xử lý hủy sự cố tại thời điểm này.</td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
-

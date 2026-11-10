@@ -30,7 +30,7 @@ namespace FootballPitchManagement.Services
 
             if (booking == null)
             {
-                return (false, "Booking not found.", "NOT_FOUND");
+                return (false, "Không tìm thấy thông tin đơn đặt sân.", "NOT_FOUND");
             }
 
             var now = DateTime.UtcNow;
@@ -39,7 +39,7 @@ namespace FootballPitchManagement.Services
                          booking.Status == BookingStatus.CANCELLED ||
                          booking.HoldExpiresAt < now;
 
-            // Scenario 1: Payment Failed
+            // Kịch bản 1: Thanh toán thất bại từ phía ngân hàng / cổng thanh toán
             if (simulatedResult == PaymentStatus.FAILED)
             {
                 var failedPayment = new Payment
@@ -54,7 +54,6 @@ namespace FootballPitchManagement.Services
                 };
                 _context.Payments.Add(failedPayment);
 
-                // If hold still active, keep or transition to PAYMENT_FAILED
                 if (booking.HoldExpiresAt > now && booking.Status == BookingStatus.PENDING_PAYMENT)
                 {
                     booking.Status = BookingStatus.PAYMENT_FAILED;
@@ -65,14 +64,14 @@ namespace FootballPitchManagement.Services
                 {
                     await _notificationService.SendNotificationAsync(
                         booking.AccountId.Value,
-                        "PAYMENT_FAILED",
-                        $"Online payment for booking {booking.BookingCode} failed. You can retry before the hold expires.");
+                        "THANH_TOÁN_THẤT_BẠI",
+                        $"Giao dịch thanh toán cho đơn {booking.BookingCode} không thành công. Bạn có thể thử lại trước khi hết thời gian giữ chỗ.");
                 }
 
-                return (false, "Payment failed from the gateway.", "FAILED");
+                return (false, "Giao dịch thanh toán không thành công từ phía ngân hàng / cổng thanh toán.", "FAILED");
             }
 
-            // Scenario 2: Payment Pending / Unknown / Timeout
+            // Kịch bản 2: Giao dịch đang chờ xử lý / Timeout
             if (simulatedResult == PaymentStatus.PENDING)
             {
                 var pendingPayment = new Payment
@@ -88,14 +87,14 @@ namespace FootballPitchManagement.Services
                 _context.Payments.Add(pendingPayment);
                 await _context.SaveChangesAsync();
 
-                return (false, "Payment is in pending/unknown status. Please verify status with provider.", "PENDING");
+                return (false, "Giao dịch đang chờ xác nhận từ phía ngân hàng. Đơn giữ chỗ chưa được kích hoạt.", "PENDING");
             }
 
-            // Scenario 3: Payment Success
+            // Kịch bản 3: Thanh toán thành công
             var successPayment = new Payment
             {
                 BookingId = booking.BookingId,
-                TransactionRef = "TXN-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                TransactionRef = "VNPAY-" + DateTime.Now.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..6].ToUpper(),
                 Amount = amount,
                 Method = method,
                 Channel = PaymentChannel.ONLINE,
@@ -106,15 +105,14 @@ namespace FootballPitchManagement.Services
 
             if (isLate)
             {
-                // Late payment handling (UC14):
-                // Record payment, create 100% RefundRequest
+                // Thanh toán muộn khi thời gian giữ chỗ 15p đã hết (UC14)
                 var refundRequest = new RefundRequest
                 {
                     RefundCode = "REF-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
                     BookingId = booking.BookingId,
                     Payment = successPayment,
                     Amount = amount,
-                    Reason = "Late payment received after hold expired or booking cancelled.",
+                    Reason = "Thanh toán nhận được sau khi hết hạn 15 phút giữ chỗ hoặc đơn đã bị hủy.",
                     RefundType = RefundType.LATE_PAYMENT,
                     Status = RefundStatus.PENDING,
                     CreatedAt = now
@@ -126,14 +124,14 @@ namespace FootballPitchManagement.Services
                 {
                     await _notificationService.SendNotificationAsync(
                         booking.AccountId.Value,
-                        "LATE_PAYMENT_REFUND",
-                        $"Your payment for {booking.BookingCode} arrived after hold expiry. The slot was released, and a 100% refund of {amount:N0} VND has been queued.");
+                        "HOÀN_TIỀN_DO_QUÁ_HẠN",
+                        $"Tiền thanh toán cho đơn {booking.BookingCode} được ghi nhận sau khi hết hạn giữ chỗ. Hệ thống đã tự động tạo yêu cầu hoàn tiền 100% ({amount:N0} đ) chuyển về tài khoản của bạn.");
                 }
 
-                return (true, "Payment arrived late after hold expired. A 100% refund has been queued.", "LATE_PAYMENT");
+                return (true, "Thanh toán đến sau khi hết thời gian giữ chỗ. Hệ thống đã tự động đưa vào hàng đợi hoàn tiền 100%.", "LATE_PAYMENT");
             }
 
-            // Normal timely payment
+            // Thanh toán đúng hạn bình thường
             booking.PaidAmount += amount;
             booking.BalanceDue = Math.Max(0, booking.AgreedPrice - booking.PaidAmount);
 
@@ -152,11 +150,11 @@ namespace FootballPitchManagement.Services
             {
                 await _notificationService.SendNotificationAsync(
                     booking.AccountId.Value,
-                    "BOOKING_CONFIRMED",
-                    $"Your booking {booking.BookingCode} is confirmed! Paid: {amount:N0} VND. Remaining balance: {booking.BalanceDue:N0} VND.");
+                    "ĐÃ_XÁC_NHẬN_ĐẶT_SÂN",
+                    $"Đơn đặt sân {booking.BookingCode} đã được xác nhận thành công! Số tiền đã cọc: {amount:N0} đ. Số tiền còn lại khi ra sân: {booking.BalanceDue:N0} đ.");
             }
 
-            return (true, "Payment successful! Your booking is confirmed.", "SUCCESS");
+            return (true, "Thanh toán thành công! Đơn đặt sân của bạn đã được xác nhận.", "SUCCESS");
         }
 
         public async Task<(bool Success, string Message)> RecordDirectPaymentAsync(
@@ -169,13 +167,13 @@ namespace FootballPitchManagement.Services
             var booking = await _context.Bookings.FindAsync(bookingId);
             if (booking == null)
             {
-                return (false, "Booking not found.");
+                return (false, "Không tìm thấy đơn đặt sân.");
             }
 
             var payment = new Payment
             {
                 BookingId = booking.BookingId,
-                TransactionRef = "DIR-" + Guid.NewGuid().ToString("N")[..8].ToUpper(),
+                TransactionRef = "QUAY-" + DateTime.Now.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..6].ToUpper(),
                 Amount = amount,
                 Method = method,
                 Channel = PaymentChannel.DIRECT,
@@ -203,12 +201,11 @@ namespace FootballPitchManagement.Services
             {
                 await _notificationService.SendNotificationAsync(
                     booking.AccountId.Value,
-                    "PAYMENT_RECORDED",
-                    $"Direct payment of {amount:N0} VND received at counter for {booking.BookingCode}. Balance: {booking.BalanceDue:N0} VND.");
+                    "PHIẾU_THU_TẠI_QUẦY",
+                    $"Đã thu trực tiếp {amount:N0} đ tại quầy lễ tân cho đơn {booking.BookingCode}. Số dư còn lại: {booking.BalanceDue:N0} đ.");
             }
 
-            return (true, "Direct payment recorded successfully.");
+            return (true, "Ghi nhận thanh toán tại quầy thành công.");
         }
     }
 }
-
