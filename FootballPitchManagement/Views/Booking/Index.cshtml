@@ -1,0 +1,59 @@
+@model IEnumerable<FootballPitchManagement.Models.Entities.Booking>
+
+@{
+    ViewData["Title"] = "All Bookings";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Bookings Overview</h2>
+        <div>
+            <a asp-action="Create" class="btn btn-primary">Create Booking</a>
+            <a asp-action="History" class="btn btn-outline-secondary">Lookup History</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Pitch</th>
+                <th>Customer Name</th>
+                <th>Phone</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Total (VND)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.BookingId</td>
+                        <td>@(item.Pitch?.Name ?? $"Pitch #{item.PitchId}")</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.CustomerPhone</td>
+                        <td>@item.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.EndTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.TotalAmount.ToString("N0")</td>
+                        <td>
+                            <span class="badge @(item.Status == "Confirmed" ? "bg-success" : (item.Status == "Cancelled" ? "bg-danger" : "bg-warning text-dark"))">
+                                @item.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center">No bookings found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

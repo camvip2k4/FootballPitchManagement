@@ -1,0 +1,68 @@
+@model IEnumerable<FootballPitchManagement.Models.Entities.Booking>
+
+@{
+    ViewData["Title"] = "Booking History";
+}
+
+<div class="container mt-4">
+    <h2>Customer Booking History</h2>
+    <hr />
+
+    <form method="get" asp-action="History" class="row g-3 mb-4">
+        <div class="col-auto">
+            <label for="phone" class="visually-hidden">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone" value="@ViewBag.CustomerPhone" placeholder="Enter phone number..." />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Booking ID</th>
+                <th>Pitch</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Total Price</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.BookingId</td>
+                        <td>@(item.Pitch?.Name ?? $"Pitch #{item.PitchId}")</td>
+                        <td>@item.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.EndTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@item.TotalAmount.ToString("N0") VND</td>
+                        <td>
+                            <span class="badge @(item.Status == "Confirmed" ? "bg-success" : (item.Status == "Cancelled" ? "bg-danger" : "bg-secondary"))">
+                                @item.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">No booking records found. Enter a phone number to search.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

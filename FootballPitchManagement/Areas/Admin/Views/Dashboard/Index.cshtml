@@ -1,0 +1,78 @@
+@model IEnumerable<FootballPitchManagement.Models.Entities.Booking>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <h2>Admin Dashboard</h2>
+    <hr />
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Pitches</h5>
+                    <p class="card-text fs-2">@ViewBag.TotalPitches</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Bookings</h5>
+                    <p class="card-text fs-2">@ViewBag.TotalBookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <p class="card-text fs-2">@(((decimal)ViewBag.TotalRevenue).ToString("N0")) VND</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Recent Bookings</h4>
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Booking ID</th>
+                <th>Pitch</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Start Time</th>
+                <th>Total</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var b in Model)
+                {
+                    <tr>
+                        <td>#@b.BookingId</td>
+                        <td>@(b.Pitch?.Name ?? $"Pitch #{b.PitchId}")</td>
+                        <td>@b.CustomerName</td>
+                        <td>@b.CustomerPhone</td>
+                        <td>@b.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@b.TotalAmount.ToString("N0") VND</td>
+                        <td>
+                            <span class="badge @(b.Status == "Confirmed" ? "bg-success" : "bg-secondary")">@b.Status</span>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">No bookings yet.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

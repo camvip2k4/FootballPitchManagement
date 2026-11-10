@@ -1,0 +1,40 @@
+@model FootballPitchManagement.Models.ViewModels.PitchDetailVM
+
+@{
+    ViewData["Title"] = "Pitch Details";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4>@Model.PitchName Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Pitch Name</dt>
+                <dd class="col-sm-9">@Model.PitchName</dd>
+
+                <dt class="col-sm-3">Pitch Type</dt>
+                <dd class="col-sm-9">@Model.PitchTypeName</dd>
+
+                <dt class="col-sm-3">Hourly Rate</dt>
+                <dd class="col-sm-9">@Model.HourlyRate.ToString("N0") VND / hour</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <a asp-action="List" class="btn btn-secondary">Back to List</a>
+            <a asp-controller="Booking" asp-action="Create" asp-route-pitchId="@Model.PitchId" class="btn btn-success">Book This Pitch</a>
+        </div>
+    </div>
+</div>
+
