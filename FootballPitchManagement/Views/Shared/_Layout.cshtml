@@ -108,13 +108,13 @@
             display: inline-flex;
             align-items: center;
             gap: 0.65rem;
-            padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 2rem;
+            border-radius: 9999px;
             text-decoration: none;
             color: #ffffff !important;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap !important;
             cursor: pointer;
         }
@@ -122,30 +122,33 @@
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.25);
             color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
         .user-chip-avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
             font-size: 1.05rem;
             flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
         }
         .user-chip-avatar-lg {
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
         }
         .user-chip-info {
             display: flex;
@@ -162,9 +165,30 @@
         .user-chip-badge {
             font-size: 0.725rem;
             font-weight: 600;
-            padding: 0.2rem 0.55rem;
-            border-radius: 1rem;
-            letter-spacing: 0.2px;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+        .role-pill-admin {
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .role-pill-manager {
+            background: rgba(59, 130, 246, 0.2) !important;
+            color: #93c5fd !important;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        .role-pill-staff {
+            background: rgba(245, 158, 11, 0.2) !important;
+            color: #fde68a !important;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .role-pill-customer {
+            background: rgba(16, 185, 129, 0.18) !important;
+            color: #6ee7b7 !important;
+            border: 1px solid rgba(16, 185, 129, 0.35);
         }
         .user-chip-arrow {
             font-size: 0.75rem;
@@ -258,13 +282,14 @@
         bool isManager = roleClaim == "MANAGER" || roleClaim == "ADMIN" || User.IsInRole("MANAGER") || User.IsInRole("Manager") || User.IsInRole("ADMIN") || User.IsInRole("Admin");
         bool isAdmin = roleClaim == "ADMIN" || User.IsInRole("ADMIN") || User.IsInRole("Admin");
 
-        string roleBadge = roleClaim switch
+        string rolePillClass = roleClaim switch
         {
-            "ADMIN" => "bg-danger",
-            "MANAGER" => "bg-primary",
-            "STAFF" => "bg-warning text-dark",
-            _ => "bg-success"
+            "ADMIN" => "role-pill-admin",
+            "MANAGER" => "role-pill-manager",
+            "STAFF" => "role-pill-staff",
+            _ => "role-pill-customer"
         };
+
         string roleShortTitle = roleClaim switch
         {
             "ADMIN" => "Admin",
@@ -277,8 +302,11 @@
             "ADMIN" => "Quản Trị Viên (Admin)",
             "MANAGER" => "Quản Lý Cơ Sở (Manager)",
             "STAFF" => "Nhân Viên Lễ Tân (Staff)",
-            _ => "Khách Hàng"
+            _ => "Khách Hàng Thân Thiết"
         };
+
+        var userFullName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+        string displayName = !string.IsNullOrWhiteSpace(userFullName) ? userFullName : (User.Identity?.Name ?? "Người dùng");
     }
 
     <header class="header-main sticky-top">
@@ -413,20 +441,21 @@
                                         <i class="bi bi-person-fill"></i>
                                     </div>
                                     <div class="user-chip-info">
-                                        <span class="user-chip-name">@User.Identity.Name</span>
-                                        <span class="badge @roleBadge user-chip-badge">@roleShortTitle</span>
+                                        <span class="user-chip-name">@displayName</span>
+                                        <span class="user-chip-badge @rolePillClass">@roleShortTitle</span>
                                     </div>
                                     <i class="bi bi-chevron-down user-chip-arrow"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2 mt-2 user-dropdown-panel" aria-labelledby="userMenuBtn">
-                                    <li class="px-3 py-2 border-bottom user-panel-header">
-                                        <div class="d-flex align-items-center gap-2">
+                                    <li class="px-3 py-3 border-bottom user-panel-header">
+                                        <div class="d-flex align-items-center gap-3">
                                             <div class="user-chip-avatar-lg">
                                                 <i class="bi bi-person-fill"></i>
                                             </div>
-                                            <div>
-                                                <div class="fw-bold text-white fs-6">@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value</div>
-                                                <small class="badge @roleBadge">@roleTitle</small>
+                                            <div class="overflow-hidden">
+                                                <div class="fw-bold text-white fs-6 text-truncate">@displayName</div>
+                                                <small class="text-secondary d-block mb-1">@@@User.Identity.Name</small>
+                                                <span class="user-chip-badge @rolePillClass">@roleTitle</span>
                                             </div>
                                         </div>
                                     </li>
