@@ -1,21 +1,32 @@
 using System.Diagnostics;
+using FootballPitchManagement.Data;
 using FootballPitchManagement.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FootballPitchManagement.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var fields = await _context.FootballFields
+                .Include(f => f.TimeSlots)
+                .Where(f => f.IsActive)
+                .Take(6)
+                .ToListAsync();
+
+            ViewBag.TotalFields = await _context.FootballFields.CountAsync(f => f.IsActive);
+            ViewBag.TotalBookings = await _context.Bookings.CountAsync();
+
+            return View(fields);
         }
 
         public IActionResult Privacy()

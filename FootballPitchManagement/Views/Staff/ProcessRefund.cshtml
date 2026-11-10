@@ -1,0 +1,67 @@
+@model FootballPitchManagement.Models.ViewModels.ProcessRefundVM
+
+@{
+    ViewData["Title"] = "Process Refund (UC34)";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-info text-white py-3">
+                <h4 class="mb-0"><i class="bi bi-wallet2"></i> Process Refund Request (UC34)</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-light border mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Refund Code:</span>
+                        <strong class="text-primary">@Model.RefundCode</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Refund Amount:</span>
+                        <strong class="text-success fs-5">@Model.Amount.ToString("N0") VND</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Type:</span>
+                        <span class="badge bg-secondary">@Model.RefundType</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Reason:</span>
+                        <p class="mb-0 small text-dark fw-semibold">@Model.Reason</p>
+                    </div>
+                </div>
+
+                <form asp-action="ProcessRefund" method="post">
+                    <input type="hidden" asp-for="RefundId" />
+                    <input type="hidden" asp-for="RefundCode" />
+                    <input type="hidden" asp-for="Amount" />
+
+                    <div class="mb-3">
+                        <label asp-for="EvidenceProof" class="form-label fw-bold">Evidence Proof / Banking Reference / Cash Receipt Slip:</label>
+                        <input asp-for="EvidenceProof" class="form-control" placeholder="e.g. Bank Ref #VNPAY-REF-9988 or Signed cash slip" />
+                        <span asp-validation-for="EvidenceProof" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Refund Execution Result</label>
+                        <select asp-for="IsSuccess" class="form-select">
+                            <option value="true">Mark as SUCCESS (Refund disbursed to customer)</option>
+                            <option value="false">Mark as FAILED (Transfer failed / Customer dispute)</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-info text-white btn-lg fw-semibold py-2">
+                            <i class="bi bi-check-all"></i> Submit Refund Record
+                        </button>
+                        <a asp-action="RefundQueue" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

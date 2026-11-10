@@ -1,10 +1,14 @@
 using FootballPitchManagement.Data;
+using FootballPitchManagement.Models.Enums;
+using FootballPitchManagement.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FootballPitchManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Manager,Admin")]
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -16,20 +20,33 @@ namespace FootballPitchManagement.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ViewBag.TotalPitches = await _context.Pitches.CountAsync();
-            ViewBag.TotalBookings = await _context.Bookings.CountAsync();
-            ViewBag.TotalRevenue = await _context.Invoices
-                .Where(i => i.PaymentStatus == "Paid")
-                .SumAsync(i => (decimal?)i.TotalAmount) ?? 0;
+            var today = DateTime.Today;
 
-            var recentBookings = await _context.Bookings
-                .Include(b => b.Pitch)
-                .OrderByDescending(b => b.CreatedAt)
-                .Take(5)
-                .ToListAsync();
+            var vm = new DashboardVM
+            {
+                TotalFields = await _context.FootballFields.CountAsync(),
+                ActiveFields = await _context.FootballFields.CountAsync(f => f.IsActive),
+                TodayBookings = await _context.Bookings.CountAsync(b => b.BookingDate.Date == today),
+                PendingRefunds = await _context.RefundRequests.CountAsync(r => r.Status == RefundStatus.PENDING),
+                TotalRevenue = await _context.Payments.Where(p => p.Status == PaymentStatus.SUCCESS).SumAsync(p => (decimal?)p.Amount) ?? 0,
+                TodayRevenue = await _context.Payments.Where(p => p.Status == PaymentStatus.SUCCESS && p.PaidAt.Date == today).SumAsync(p => (decimal?)p.Amount) ?? 0,
+                RecentBookings = await _context.Bookings
+                    .Include(b => b.Field)
+                    .Include(b => b.TimeSlot)
+                    .Include(b => b.Account)
+                    .OrderByDescending(b => b.CreatedAt)
+                    .Take(8)
+                    .ToListAsync(),
+                PendingRefundRequests = await _context.RefundRequests
+                    .Include(r => r.Booking)
+                        .ThenInclude(b => b!.Field)
+                    .Where(r => r.Status == RefundStatus.PENDING)
+                    .OrderBy(r => r.CreatedAt)
+                    .Take(5)
+                    .ToListAsync()
+            };
 
-            return View(recentBookings);
+            return View(vm);
         }
     }
 }
-

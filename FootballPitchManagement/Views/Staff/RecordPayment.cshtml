@@ -1,0 +1,63 @@
+@model FootballPitchManagement.Models.ViewModels.RecordPaymentVM
+
+@{
+    ViewData["Title"] = "Record Direct Payment (UC23)";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-dark py-3">
+                <h4 class="mb-0"><i class="bi bi-cash-stack"></i> Record Direct Counter Payment (UC23)</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-light border mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Booking Code:</span>
+                        <strong class="text-primary">@Model.BookingCode</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Current Balance Due:</span>
+                        <strong class="text-danger fs-5">@Model.BalanceDue.ToString("N0") VND</strong>
+                    </div>
+                </div>
+
+                <form asp-action="RecordPayment" method="post">
+                    <input type="hidden" asp-for="BookingId" />
+                    <input type="hidden" asp-for="BookingCode" />
+
+                    <div class="mb-3">
+                        <label asp-for="Amount" class="form-label fw-bold">Payment Amount (VND)</label>
+                        <input asp-for="Amount" class="form-control form-control-lg fw-bold text-success" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Method" class="form-label fw-bold">Payment Method</label>
+                        <select asp-for="Method" class="form-select">
+                            <option value="CASH">Cash at Counter</option>
+                            <option value="BANK_TRANSFER">Bank Transfer (VietQR)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ReceiptRef" class="form-label">Receipt / Transaction Note</label>
+                        <input asp-for="ReceiptRef" class="form-control" placeholder="e.g. Receipt #1234 or Transfer Ref" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg fw-semibold py-2">
+                            <i class="bi bi-check-lg"></i> Record Payment
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

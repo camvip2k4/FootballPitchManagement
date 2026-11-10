@@ -1,41 +1,8 @@
-@model IEnumerable<FootballPitchManagement.Models.ViewModels.PitchDetailVM>
-
 @{
-    ViewData["Title"] = "Pitches List";
+    ViewData["Title"] = "Pitches";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Available Football Pitches</h2>
-    </div>
-
-    <div class="row">
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var pitch in Model)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">@pitch.PitchName</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Type: @pitch.PitchTypeName</h6>
-                            <p class="card-text">@pitch.Description</p>
-                            <p class="text-primary font-weight-bold">Rate: @pitch.HourlyRate.ToString("N0") VND / hour</p>
-                        </div>
-                        <div class="card-footer bg-transparent d-flex justify-content-between">
-                            <a asp-action="Details" asp-route-id="@pitch.PitchId" class="btn btn-outline-secondary btn-sm">Details</a>
-                            <a asp-controller="Booking" asp-action="Create" asp-route-pitchId="@pitch.PitchId" class="btn btn-success btn-sm">Book Now</a>
-                        </div>
-                    </div>
-                </div>
-            }
-        }
-        else
-        {
-            <div class="col-12">
-                <div class="alert alert-info">No pitches are currently available.</div>
-            </div>
-        }
-    </div>
+<div class="text-center py-5">
+    <h3>Redirecting to Field Search...</h3>
+    <a asp-controller="Field" asp-action="Index" class="btn btn-primary mt-3">Go to Field Search</a>
 </div>
-

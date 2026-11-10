@@ -1,58 +1,8 @@
-@model FootballPitchManagement.Models.Entities.Pitch
-
 @{
     ViewData["Title"] = "Edit Pitch";
 }
 
-<div class="container mt-4">
-    <h2>Edit Pitch</h2>
-    <hr />
-
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Edit" method="post">
-                <input type="hidden" asp-for="PitchId" />
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label">Pitch Name</label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="PitchTypeId" class="form-label">Pitch Type</label>
-                    <select asp-for="PitchTypeId" asp-items="ViewBag.PitchTypes" class="form-select">
-                        <option value="">-- Select Pitch Type --</option>
-                    </select>
-                    <span asp-validation-for="PitchTypeId" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="HourlyRate" class="form-label">Hourly Rate (VND)</label>
-                    <input asp-for="HourlyRate" class="form-control" type="number" step="10000" />
-                    <span asp-validation-for="HourlyRate" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3 form-check">
-                    <input asp-for="IsActive" class="form-check-input" />
-                    <label asp-for="IsActive" class="form-check-label">Is Active</label>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label">Description</label>
-                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-            </form>
-        </div>
-    </div>
+<div class="text-center py-5">
+    <h3>Redirecting to Field Management...</h3>
+    <a asp-controller="FieldManagement" asp-action="Index" class="btn btn-primary mt-3">Back to Field Management</a>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
-

@@ -1,8 +1,138 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IEnumerable<FootballPitchManagement.Models.Entities.FootballField>
+
+@{
+    ViewData["Title"] = "Football Field Management System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="hero-banner shadow-sm">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold mb-3">Premium Football Fields Booking</h1>
+            <p class="lead mb-4">
+                Real-time slot availability, instant 15-minute slot holds, transparent pricing and automatic refund management.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-controller="Field" asp-action="Index" class="btn btn-warning btn-lg fw-semibold text-dark shadow-sm">
+                    <i class="bi bi-calendar-check"></i> Book a Field Now
+                </a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Booking" asp-action="MyBookings" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-journal-check"></i> My Bookings
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In / Demo Login
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4 text-center d-none d-lg-block">
+            <i class="bi bi-trophy text-warning" style="font-size: 8rem;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Search Form -->
+<div class="card shadow-sm border-0 mb-5 mt-n4">
+    <div class="card-body p-4 bg-white rounded">
+        <form asp-controller="Field" asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold text-muted"><i class="bi bi-calendar3"></i> Choose Date</label>
+                <input type="date" name="date" class="form-control form-control-lg" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold text-muted"><i class="bi bi-grid-3x3"></i> Field Type</label>
+                <select name="fieldType" class="form-select form-select-lg">
+                    <option value="">All Field Sizes</option>
+                    <option value="FIELD_5">5-a-side Mini Pitch</option>
+                    <option value="FIELD_7">7-a-side Medium Pitch</option>
+                    <option value="FIELD_11">11-a-side Full Stadium</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
+                    <i class="bi bi-search"></i> Search Available Slots
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Featured Fields -->
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0">Our Pitches</h3>
+            <p class="text-muted mb-0">Well-maintained artificial grass pitches with modern lighting</p>
+        </div>
+        <a asp-controller="Field" asp-action="Index" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var field in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold mb-0">@field.Name</h5>
+                                <span class="badge @(field.Status == FootballPitchManagement.Models.Enums.FieldStatus.AVAILABLE ? "bg-success" : "bg-danger")">
+                                    @field.Status
+                                </span>
+                            </div>
+                            <span class="badge bg-secondary mb-3">@field.FieldType</span>
+                            <p class="card-text text-muted small"><i class="bi bi-geo-alt"></i> @field.Location</p>
+                            <p class="card-text">@field.Description</p>
+                            <p class="text-muted small">
+                                <i class="bi bi-clock"></i> Hours: @field.OpenTime.ToString(@"hh\:mm") - @field.CloseTime.ToString(@"hh\:mm")
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pt-0 pb-3">
+                            <a asp-controller="Field" asp-action="Details" asp-route-id="@field.FieldId" class="btn btn-outline-success w-100">
+                                <i class="bi bi-calendar4-range"></i> Check Slots & Pricing
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- System Features & Policies Highlights -->
+<div class="row g-4 text-center my-4">
+    <div class="col-md-3">
+        <div class="p-4 bg-white rounded shadow-sm h-100">
+            <i class="bi bi-stopwatch text-warning" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold mt-3">15-Minute Hold</h5>
+            <p class="text-muted small">When you book, the slot is locked exclusively for 15 minutes while you make prepayment.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-4 bg-white rounded shadow-sm h-100">
+            <i class="bi bi-pie-chart text-primary" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold mt-3">Dynamic Pricing</h5>
+            <p class="text-muted small">Automatic rate calculation based on day type (weekday/weekend) and peak hour tiers.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-4 bg-white rounded shadow-sm h-100">
+            <i class="bi bi-shield-check text-success" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold mt-3">Fair Cancellation</h5>
+            <p class="text-muted small">Cancel anytime up to 24 hours before kick-off to receive automated refund processing.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-4 bg-white rounded shadow-sm h-100">
+            <i class="bi bi-currency-exchange text-info" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold mt-3">100% Weather Refund</h5>
+            <p class="text-muted small">In case of extreme weather or pitch maintenance, the facility refunds 100% of your money.</p>
+        </div>
+    </div>
 </div>

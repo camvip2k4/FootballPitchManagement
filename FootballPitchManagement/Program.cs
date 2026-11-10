@@ -1,5 +1,6 @@
 using FootballPitchManagement.Data;
 using FootballPitchManagement.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,10 +8,30 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Authentication with Cookies
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    });
+
+// Business Logic Services
+builder.Services.AddScoped<IBusinessPolicyService, BusinessPolicyService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<IAvailabilityChecker, AvailabilityChecker>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IRefundService, RefundService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+
+// System Timer Background Worker (UC40 & UC35)
+builder.Services.AddHostedService<HoldExpiryBackgroundService>();
 
 var app = builder.Build();
 
@@ -34,13 +55,13 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

@@ -1,0 +1,75 @@
+@model FootballPitchManagement.Models.Entities.FootballField
+
+@{
+    ViewData["Title"] = "Add Football Pitch";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Add Football Field (UC24)</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Field Name</label>
+                        <input asp-for="Name" class="form-control" placeholder="e.g. Pitch 5A - Mini Stadium" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FieldType" class="form-label fw-bold">Field Type (Size)</label>
+                            <select asp-for="FieldType" class="form-select">
+                                <option value="FIELD_5">5-a-side (Mini Pitch)</option>
+                                <option value="FIELD_7">7-a-side (Medium Pitch)</option>
+                                <option value="FIELD_11">11-a-side (Full Stadium)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Location" class="form-label fw-bold">Location / Zone</label>
+                            <input asp-for="Location" class="form-control" placeholder="e.g. Zone A, North Gate" />
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="OpenTime" class="form-label fw-bold">Open Time</label>
+                            <input asp-for="OpenTime" class="form-control" type="time" value="06:00" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CloseTime" class="form-label fw-bold">Close Time</label>
+                            <input asp-for="CloseTime" class="form-control" type="time" value="23:00" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description / Pitch Specifications</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Grass type, lighting system, turf quality..."></textarea>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                        <label asp-for="IsActive" class="form-check-label fw-semibold">Activate Immediately (Bookable in public catalog)</label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg fw-semibold py-2">
+                            <i class="bi bi-save"></i> Save Field
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

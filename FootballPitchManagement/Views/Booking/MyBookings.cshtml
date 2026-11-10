@@ -1,0 +1,105 @@
+@model IEnumerable<FootballPitchManagement.Models.Entities.Booking>
+
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-journal-bookmark"></i> My Booking History</h2>
+        <p class="text-muted mb-0">Track your football pitch bookings, payments, and cancellations</p>
+    </div>
+    <a asp-controller="Field" asp-action="Index" class="btn btn-primary fw-semibold">
+        <i class="bi bi-plus-circle"></i> Book New Field
+    </a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive bg-white rounded shadow-sm p-3">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Pitch & Slot</th>
+                    <th>Match Date</th>
+                    <th>Agreed Price</th>
+                    <th>Paid</th>
+                    <th>Balance Due</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@item.BookingCode</td>
+                        <td>
+                            <div class="fw-semibold">@(item.Field?.Name ?? $"Field #{item.FieldId}")</div>
+                            <small class="text-muted"><i class="bi bi-clock"></i> @(item.TimeSlot?.SlotName ?? "Slot")</small>
+                        </td>
+                        <td>
+                            <span class="fw-semibold">@item.BookingDate.ToString("dd/MM/yyyy")</span>
+                        </td>
+                        <td>@item.AgreedPrice.ToString("N0") VND</td>
+                        <td class="text-success fw-bold">@item.PaidAmount.ToString("N0") VND</td>
+                        <td class="@(item.BalanceDue > 0 ? "text-danger fw-bold" : "text-muted")">
+                            @item.BalanceDue.ToString("N0") VND
+                        </td>
+                        <td>
+                            @{
+                                string badge = item.Status switch
+                                {
+                                    FootballPitchManagement.Models.Enums.BookingStatus.CONFIRMED => "bg-success",
+                                    FootballPitchManagement.Models.Enums.BookingStatus.CHECKED_IN => "bg-info text-dark",
+                                    FootballPitchManagement.Models.Enums.BookingStatus.PENDING_PAYMENT => "bg-warning text-dark",
+                                    FootballPitchManagement.Models.Enums.BookingStatus.COMPLETED => "bg-primary",
+                                    FootballPitchManagement.Models.Enums.BookingStatus.CANCELLED => "bg-secondary",
+                                    FootballPitchManagement.Models.Enums.BookingStatus.EXPIRED => "bg-dark",
+                                    FootballPitchManagement.Models.Enums.BookingStatus.NO_SHOW => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badge">@item.Status</span>
+                            @if (item.Status == FootballPitchManagement.Models.Enums.BookingStatus.PENDING_PAYMENT && item.HoldExpiresAt > DateTime.UtcNow)
+                            {
+                                <small class="d-block text-warning small mt-1">
+                                    Hold until: @item.HoldExpiresAt.ToString("HH:mm:ss")
+                                </small>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                @if (item.Status == FootballPitchManagement.Models.Enums.BookingStatus.PENDING_PAYMENT ||
+                                     item.Status == FootballPitchManagement.Models.Enums.BookingStatus.PAYMENT_FAILED)
+                                {
+                                    <a asp-action="Payment" asp-route-id="@item.BookingId" class="btn btn-sm btn-success">
+                                        <i class="bi bi-credit-card"></i> Pay Now
+                                    </a>
+                                }
+                                @if (item.Status == FootballPitchManagement.Models.Enums.BookingStatus.CONFIRMED ||
+                                     item.Status == FootballPitchManagement.Models.Enums.BookingStatus.PENDING_PAYMENT)
+                                {
+                                    <a asp-action="Cancel" asp-route-id="@item.BookingId" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-light text-center py-5 border shadow-sm rounded">
+        <i class="bi bi-calendar-x display-4 text-muted"></i>
+        <h5 class="mt-3">You don't have any bookings yet</h5>
+        <p class="text-muted">Choose your favorite pitch and book a match slot now.</p>
+        <a asp-controller="Field" asp-action="Index" class="btn btn-primary mt-2">Browse Pitches</a>
+    </div>
+}
+
