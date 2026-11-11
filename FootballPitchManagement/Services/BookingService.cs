@@ -76,14 +76,17 @@ namespace FootballPitchManagement.Services
         {
             var target = date.Date;
             var nextTarget = target.AddDays(1);
-            return await _context.Bookings
+            var bookings = await _context.Bookings
                 .Include(b => b.Field)
                 .Include(b => b.TimeSlot)
                 .Include(b => b.Account)
                 .Include(b => b.Payments)
                 .Where(b => b.BookingDate >= target && b.BookingDate < nextTarget)
-                .OrderBy(b => b.TimeSlot != null ? b.TimeSlot.StartTime : TimeSpan.Zero)
                 .ToListAsync();
+
+            return bookings
+                .OrderBy(b => b.TimeSlot != null ? b.TimeSlot.StartTime : TimeSpan.Zero)
+                .ToList();
         }
 
         // Đặt sân trực tuyến từ phía khách hàng (UC10)

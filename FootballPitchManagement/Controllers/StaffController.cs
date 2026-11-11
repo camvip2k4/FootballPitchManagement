@@ -53,7 +53,7 @@ namespace FootballPitchManagement.Controllers
             var fields = await _context.FootballFields.Where(f => f.IsActive && f.Status != FieldStatus.MAINTENANCE).ToListAsync();
             ViewBag.Fields = new SelectList(fields, "FieldId", "Name");
 
-            var slots = await _context.TimeSlots.Where(s => s.IsActive).OrderBy(s => s.StartTime).ToListAsync();
+            var slots = (await _context.TimeSlots.Where(s => s.IsActive).ToListAsync()).OrderBy(s => s.StartTime).ToList();
             ViewBag.Slots = new SelectList(slots, "SlotId", "SlotName");
 
             return View(new WalkInBookingVM { BookingDate = DateTime.Today });
@@ -68,7 +68,7 @@ namespace FootballPitchManagement.Controllers
             {
                 var fields = await _context.FootballFields.Where(f => f.IsActive).ToListAsync();
                 ViewBag.Fields = new SelectList(fields, "FieldId", "Name", model.FieldId);
-                var slots = await _context.TimeSlots.Where(s => s.IsActive).OrderBy(s => s.StartTime).ToListAsync();
+                var slots = (await _context.TimeSlots.Where(s => s.IsActive).ToListAsync()).OrderBy(s => s.StartTime).ToList();
                 ViewBag.Slots = new SelectList(slots, "SlotId", "SlotName", model.SlotId);
                 return View(model);
             }
@@ -94,7 +94,7 @@ namespace FootballPitchManagement.Controllers
             ModelState.AddModelError(string.Empty, result.Message);
             var fList = await _context.FootballFields.Where(f => f.IsActive).ToListAsync();
             ViewBag.Fields = new SelectList(fList, "FieldId", "Name", model.FieldId);
-            var sList = await _context.TimeSlots.Where(s => s.IsActive).OrderBy(s => s.StartTime).ToListAsync();
+            var sList = (await _context.TimeSlots.Where(s => s.IsActive).ToListAsync()).OrderBy(s => s.StartTime).ToList();
             ViewBag.Slots = new SelectList(sList, "SlotId", "SlotName", model.SlotId);
             return View(model);
         }
