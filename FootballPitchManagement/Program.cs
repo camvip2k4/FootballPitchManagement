@@ -81,6 +81,11 @@ app.UseAuthorization();
 app.UseStaticFiles();
 
 app.MapControllerRoute(
+    name: "admin_staff_fallback",
+    pattern: "Admin/Staff/{action=Index}/{id?}",
+    defaults: new { controller = "Staff" });
+
+app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 

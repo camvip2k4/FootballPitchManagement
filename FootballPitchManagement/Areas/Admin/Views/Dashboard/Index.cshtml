@@ -66,7 +66,7 @@
                 <div>
                     <span class="text-muted small fw-bold text-uppercase">Yêu Cầu Hoàn Tiền</span>
                     <h3 class="fw-bold text-danger mt-1 mb-0">@Model.PendingRefunds</h3>
-                    <a asp-controller="Staff" asp-action="RefundQueue" class="small text-danger fw-bold text-decoration-none">Xem hàng đợi duyệt &rarr;</a>
+                    <a asp-area="" asp-controller="Staff" asp-action="RefundQueue" class="small text-danger fw-bold text-decoration-none">Xem hàng đợi duyệt &rarr;</a>
                 </div>
                 <i class="bi bi-exclamation-octagon text-danger" style="font-size: 2.5rem;"></i>
             </div>
@@ -114,7 +114,7 @@
 <div class="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
     <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-0">
         <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-receipt text-primary me-2"></i> Đơn Đặt Sân Gần Đây</h5>
-        <a asp-controller="Staff" asp-action="Index" class="btn btn-sm btn-outline-primary">Mở Bàn Điều Độ Lễ Tân</a>
+        <a asp-area="" asp-controller="Staff" asp-action="Index" class="btn btn-sm btn-outline-primary">Mở Bàn Điều Độ Lễ Tân</a>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
