@@ -28,6 +28,7 @@ namespace FootballPitchManagement.Services
             }
 
             var targetDate = bookingDate.Date;
+            var nextDate = targetDate.AddDays(1);
             var slotStart = targetDate.Add(slot.StartTime);
             var slotEnd = targetDate.Add(slot.EndTime);
 
@@ -47,7 +48,7 @@ namespace FootballPitchManagement.Services
             var conflictingBooking = await _context.Bookings.AnyAsync(b =>
                 b.FieldId == fieldId &&
                 b.SlotId == slotId &&
-                b.BookingDate.Date == targetDate &&
+                b.BookingDate >= targetDate && b.BookingDate < nextDate &&
                 (b.Status == BookingStatus.CONFIRMED ||
                  b.Status == BookingStatus.CHECKED_IN ||
                  (b.Status == BookingStatus.PENDING_PAYMENT && b.HoldExpiresAt > now)));

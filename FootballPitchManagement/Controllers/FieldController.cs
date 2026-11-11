@@ -27,6 +27,7 @@ namespace FootballPitchManagement.Controllers
         public async Task<IActionResult> Index(DateTime? date, FieldType? fieldType, string? keyword)
         {
             var searchDate = (date ?? DateTime.Today).Date;
+            var searchNextDate = searchDate.AddDays(1);
 
             var query = _context.FootballFields
                 .Include(f => f.TimeSlots.Where(s => s.IsActive))
@@ -64,7 +65,7 @@ namespace FootballPitchManagement.Controllers
 
                 // Get bookings for this field on the target date
                 var dayBookings = await _context.Bookings
-                    .Where(b => b.FieldId == f.FieldId && b.BookingDate.Date == searchDate)
+                    .Where(b => b.FieldId == f.FieldId && b.BookingDate >= searchDate && b.BookingDate < searchNextDate)
                     .ToListAsync();
 
                 foreach (var s in f.TimeSlots.OrderBy(s => s.StartTime))
@@ -138,6 +139,7 @@ namespace FootballPitchManagement.Controllers
         public async Task<IActionResult> Details(int id, DateTime? date)
         {
             var searchDate = (date ?? DateTime.Today).Date;
+            var searchNextDate = searchDate.AddDays(1);
             var field = await _context.FootballFields
                 .Include(f => f.TimeSlots.Where(s => s.IsActive))
                 .FirstOrDefaultAsync(f => f.FieldId == id);
@@ -161,7 +163,7 @@ namespace FootballPitchManagement.Controllers
 
             var now = DateTime.UtcNow;
             var dayBookings = await _context.Bookings
-                .Where(b => b.FieldId == field.FieldId && b.BookingDate.Date == searchDate)
+                .Where(b => b.FieldId == field.FieldId && b.BookingDate >= searchDate && b.BookingDate < searchNextDate)
                 .ToListAsync();
 
             foreach (var s in field.TimeSlots.OrderBy(s => s.StartTime))

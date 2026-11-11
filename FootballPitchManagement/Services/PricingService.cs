@@ -34,14 +34,15 @@ namespace FootballPitchManagement.Services
                 : TimeTier.NORMAL;
 
             var targetDate = bookingDate.Date;
+            var targetEndOfDay = targetDate.AddDays(1).AddTicks(-1);
 
             // Find matching PricingRule
             var rules = await _context.PricingRules
                 .Where(r => r.FieldId == fieldId &&
                             r.DayType == dayType &&
                             r.TimeTier == timeTier &&
-                            r.EffectiveFrom.Date <= targetDate &&
-                            r.EffectiveTo.Date >= targetDate &&
+                            r.EffectiveFrom <= targetEndOfDay &&
+                            r.EffectiveTo >= targetDate &&
                             (r.SlotId == null || r.SlotId == slotId))
                 .OrderByDescending(r => r.SlotId.HasValue ? 100 + r.Priority : r.Priority)
                 .ToListAsync();
